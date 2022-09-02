@@ -7,19 +7,32 @@ import {
   ListItemText,
   IconButton,
 } from "@mui/material";
-import { Fragment, useReducer, useState } from "react";
+import { Fragment, useEffect, useReducer, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { pink } from "@mui/material/colors";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import styled from "@emotion/styled";
 
-export default function Todos() {
+export type TodosProps = {
+  onSelectedTodoChanged: (text?: string) => void;
+};
+
+export default function Todos(props: TodosProps) {
   const [todo, setTodo] = useState("");
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [todos, dispatch] = useReducer(reducer, initialState);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTodo(event.target.value);
+  };
+
+  const handleListItemClick = (
+    _event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    index: number
+  ) => {
+    setSelectedIndex(index);
+    props.onSelectedTodoChanged(todos[index].todo);
   };
 
   const handleOnAdd = () => {
@@ -36,15 +49,22 @@ export default function Todos() {
   };
 
   const handleOnDelete = (todo: string) => {
+    props.onSelectedTodoChanged(undefined);
     dispatch({ actionType: "DeleteTodo", payload: { todo } });
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      props.onSelectedTodoChanged(todos[0]?.todo);
+    }, 100);
+  }, []);
+
   return (
     <Stack spacing={1}>
-      <TitleWrapper>Todo List ({state.length})</TitleWrapper>
+      <TitleWrapper>Task List ({todos.length})</TitleWrapper>
       <Stack spacing={1} direction="row">
         <TextField
-          label="Text"
+          label="Add New Task"
           variant="outlined"
           size="small"
           fullWidth
@@ -57,12 +77,14 @@ export default function Todos() {
       </Stack>
 
       <List>
-        {state.map(
+        {todos.map(
           ({ todo, count }: { todo: string; count: number }, index: number) => (
             <ListItem
               button
               key={`todo_${index}`}
               divider
+              selected={selectedIndex === index}
+              onClick={(event) => handleListItemClick(event, index)}
               secondaryAction={
                 <Fragment>
                   [{count}]
@@ -108,13 +130,25 @@ const TitleWrapper = styled.div`
 
 // helpers
 
-const initialState = [
+type TodoType = {
+  todo: string;
+  count: number;
+};
+
+type ActionType = {
+  actionType: string;
+  payload: {
+    todo: string;
+  };
+};
+
+const initialState: TodoType[] = [
   { todo: "x", count: 1 },
   { todo: "y", count: 1 },
   { todo: "z", count: 1 },
 ];
 
-const reducer = (state: any, action: any) => {
+const reducer = (state: TodoType[], action: ActionType) => {
   const { actionType, payload } = action;
 
   switch (actionType) {

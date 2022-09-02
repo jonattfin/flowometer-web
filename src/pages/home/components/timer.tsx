@@ -4,7 +4,7 @@ import { useEffect, useReducer } from "react";
 import { padStart } from "lodash";
 
 type TimerProps = {
-  text: string;
+  text?: string;
 };
 
 export default function Timer({ text }: TimerProps) {
@@ -40,7 +40,7 @@ export default function Timer({ text }: TimerProps) {
     return (
       <Stack spacing={2} justifyContent="center" alignItems="center">
         <TimeWrapperDiv>{`${minutes} : ${seconds}`}</TimeWrapperDiv>
-        <TitleWrapperDiv>{text}</TitleWrapperDiv>
+        <TitleWrapperDiv>{`Current task: ${text || "N/A"}`}</TitleWrapperDiv>
         <Stack
           direction="row"
           spacing={2}
