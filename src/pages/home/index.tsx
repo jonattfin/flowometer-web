@@ -1,15 +1,10 @@
 import styled from "@emotion/styled";
 import { Stack } from "@mui/material";
 import Head from "next/head";
-import { useState } from "react";
 
 import { Timer, Todos } from "./components";
 
 export default function Home() {
-  const [todo, setSelectedTodo] = useState<string | undefined>("");
-
-  const onSelectedTodoChanged = (todo?: string) => setSelectedTodo(todo);
-
   return (
     <>
       <Head>
@@ -20,10 +15,10 @@ export default function Home() {
 
       <Stack spacing={2}>
         <TimerWrapper>
-          <Timer text={todo} />
+          <Timer />
         </TimerWrapper>
         <TodosWrapper>
-          <Todos {...{ onSelectedTodoChanged }} />
+          <Todos />
         </TodosWrapper>
       </Stack>
     </>

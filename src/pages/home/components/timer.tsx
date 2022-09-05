@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import { Button, Stack } from "@mui/material";
 import { useEffect, useReducer } from "react";
 import { padStart } from "lodash";
+import { ActionType, initialState, reducer, TimerState } from "./timer-reducer";
 
 type TimerProps = {
   text?: string;
@@ -90,72 +91,10 @@ const TitleWrapperDiv = styled.div`
 
 // helpers
 
-enum TimerState {
-  Stopped,
-  Started,
-  Paused,
-  Resumed,
-}
-
-enum ActionType {
-  Start = "Start",
-  Stop = "Stop",
-  Pause = "Pause",
-  Resume = "Resume",
-  CountSeconds = "CountSeconds",
-}
-
-const initialState = {
-  seconds: 0,
-  currentState: TimerState.Stopped,
-};
-
-const reducer = (
-  state: { seconds: number; currentState: TimerState },
-  action: { type: ActionType }
-) => {
-  switch (action.type) {
-    case ActionType.Start: {
-      return {
-        ...state,
-        currentState: TimerState.Started,
-      };
-    }
-    case ActionType.CountSeconds: {
-      return {
-        ...state,
-        seconds: state.seconds + 1,
-      };
-    }
-
-    case ActionType.Stop: {
-      return {
-        ...state,
-        currentState: TimerState.Stopped,
-        seconds: 0,
-      };
-    }
-    case ActionType.Pause: {
-      return {
-        ...state,
-        currentState: TimerState.Paused,
-      };
-    }
-    case ActionType.Resume: {
-      return {
-        ...state,
-        currentState: TimerState.Started,
-      };
-    }
-    default:
-      return state;
-  }
-};
-
 function getMinutesAndSeconds(currentSeconds: number) {
   const MINUTES_PER_HOUR = 60;
 
-  const minutes = 25;
+  const minutes = 45;
   const seconds = 0;
 
   const totalSeconds = minutes * MINUTES_PER_HOUR + seconds;

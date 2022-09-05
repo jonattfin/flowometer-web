@@ -14,50 +14,52 @@ import { pink } from "@mui/material/colors";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import styled from "@emotion/styled";
 
-export type TodosProps = {
-  onSelectedTodoChanged: (text?: string) => void;
-};
+import { reducer, initialState, ActionTypeValue } from "./todos-reducer";
+
+export type TodosProps = {};
 
 export default function Todos(props: TodosProps) {
-  const [todo, setTodo] = useState("");
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [todos, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { currentTodo, selectedTodoIndex, todos } = state;
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTodo(event.target.value);
+    dispatch({
+      actionType: ActionTypeValue.ChangeDefaultTodo,
+      payload: event.target.value,
+    });
   };
 
   const handleListItemClick = (
     _event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     index: number
   ) => {
-    setSelectedIndex(index);
-    props.onSelectedTodoChanged(todos[index].todo);
+    dispatch({
+      actionType: ActionTypeValue.ChangeSelectedTodo,
+      payload: index,
+    });
   };
 
   const handleOnAdd = () => {
-    dispatch({ actionType: "AddTodo", payload: { todo } });
-    setTodo("");
+    dispatch({ actionType: ActionTypeValue.AddTodo, payload: undefined });
   };
 
   const handleOnIncrease = (todo: string) => {
-    dispatch({ actionType: "IncreaseCounter", payload: { todo } });
+    dispatch({
+      actionType: ActionTypeValue.IncreaseCounter,
+      payload: todo,
+    });
   };
 
   const handleOnDecrease = (todo: string) => {
-    dispatch({ actionType: "DecreaseCounter", payload: { todo } });
+    dispatch({
+      actionType: ActionTypeValue.DecreaseCounter,
+      payload: todo,
+    });
   };
 
   const handleOnDelete = (todo: string) => {
-    props.onSelectedTodoChanged(undefined);
-    dispatch({ actionType: "DeleteTodo", payload: { todo } });
+    dispatch({ actionType: ActionTypeValue.DeleteTodo, payload: todo });
   };
-
-  useEffect(() => {
-    setTimeout(() => {
-      props.onSelectedTodoChanged(todos[0]?.todo);
-    }, 100);
-  }, []);
 
   return (
     <Stack spacing={1}>
@@ -68,22 +70,26 @@ export default function Todos(props: TodosProps) {
           variant="outlined"
           size="small"
           fullWidth
-          value={todo}
+          value={currentTodo}
           onChange={handleChange}
         />
-        <Button variant="contained" onClick={handleOnAdd} disabled={todo == ""}>
+        <Button
+          variant="contained"
+          onClick={handleOnAdd}
+          disabled={currentTodo == ""}
+        >
           Add
         </Button>
       </Stack>
 
       <List>
-        {todos.map(
+        {state.todos.map(
           ({ todo, count }: { todo: string; count: number }, index: number) => (
             <ListItem
               button
               key={`todo_${index}`}
               divider
-              selected={selectedIndex === index}
+              selected={selectedTodoIndex === index}
               onClick={(event) => handleListItemClick(event, index)}
               secondaryAction={
                 <Fragment>
@@ -127,56 +133,3 @@ export default function Todos(props: TodosProps) {
 const TitleWrapper = styled.div`
   text-align: center;
 `;
-
-// helpers
-
-type TodoType = {
-  todo: string;
-  count: number;
-};
-
-type ActionType = {
-  actionType: string;
-  payload: {
-    todo: string;
-  };
-};
-
-const initialState: TodoType[] = [
-  { todo: "x", count: 1 },
-  { todo: "y", count: 1 },
-  { todo: "z", count: 1 },
-];
-
-const reducer = (state: TodoType[], action: ActionType) => {
-  const { actionType, payload } = action;
-
-  switch (actionType) {
-    case "AddTodo": {
-      return [...state, { todo: payload.todo, count: 1 }];
-    }
-    case "IncreaseCounter": {
-      return [
-        ...state.map((item: any) =>
-          item.todo != payload.todo
-            ? item
-            : { todo: payload.todo, count: item.count + 1 }
-        ),
-      ];
-    }
-    case "DecreaseCounter": {
-      return [
-        ...state.map((item: any) =>
-          item.todo != payload.todo
-            ? item
-            : { todo: payload.todo, count: item.count - 1 }
-        ),
-      ];
-    }
-    case "DeleteTodo": {
-      return [...state.filter((item: any) => item.todo != payload.todo)];
-    }
-    default:
-      return state;
-  }
-};
