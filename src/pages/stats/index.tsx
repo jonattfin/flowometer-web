@@ -2,19 +2,8 @@ import styled from "@emotion/styled";
 import ReactECharts from "echarts-for-react";
 
 export default function Stats() {
-  return (
-    <WrapperDiv>
-      <ReactECharts option={getOption()} />
-    </WrapperDiv>
-  );
+  return <ReactECharts option={getOption()} />;
 }
-
-const WrapperDiv = styled.div`
-  /* max-width: 30vw; */
-  display: flex;
-  align-content: center;
-  justify-content: center;
-`;
 
 function getOption() {
   return {
