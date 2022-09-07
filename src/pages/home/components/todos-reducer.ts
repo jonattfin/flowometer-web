@@ -1,5 +1,3 @@
-import { cloneDeep } from "lodash";
-
 export type TodoType = {
   currentTodo: string;
   todos: {
@@ -33,48 +31,43 @@ export enum ActionTypeValue {
 export const reducer = (state: TodoType, action: ActionType) => {
   const { actionType, payload } = action;
 
-  const clonedState = cloneDeep(state);
-
   switch (actionType) {
     case ActionTypeValue.ChangeDefaultTodo: {
-      clonedState.currentTodo = payload;
-
-      break;
+      return {
+        currentTodo: payload,
+        todos: [...state.todos],
+      };
     }
 
     case ActionTypeValue.AddTodo: {
-      clonedState.todos.push({ todo: clonedState.currentTodo, count: 1 });
-      clonedState.currentTodo = "";
-
-      break;
+      return {
+        currentTodo: "",
+        todos: [...state.todos, { todo: state.currentTodo, count: 1 }],
+      };
     }
     case ActionTypeValue.IncreaseCounter: {
-      const element = clonedState.todos.find((t) => t.todo == payload);
-      console.log(`element is ${JSON.stringify(element)}`);
-      if (element) {
-        element.count += 1;
-      }
-
-      break;
+      return {
+        currentTodo: state.currentTodo,
+        todos: state.todos.map((t) =>
+          t.todo == action.payload ? { ...t, count: t.count + 1 } : t
+        ),
+      };
     }
     case ActionTypeValue.DecreaseCounter: {
-      const element = clonedState.todos.find((t) => t.todo == payload);
-      if (element) {
-        element.count -= 1;
-      }
-
-      break;
+      return {
+        currentTodo: state.currentTodo,
+        todos: state.todos.map((t) =>
+          t.todo == action.payload ? { ...t, count: t.count - 1 } : t
+        ),
+      };
     }
     case ActionTypeValue.DeleteTodo: {
-      clonedState.todos = clonedState.todos.filter(
-        (item: any) => item.todo != payload
-      );
-
-      break;
+      return {
+        currentTodo: state.currentTodo,
+        todos: state.todos.filter((t) => t.todo !== payload),
+      };
     }
     default:
-      break;
+      return state;
   }
-
-  return clonedState;
 };
