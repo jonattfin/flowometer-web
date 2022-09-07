@@ -1,9 +1,25 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { Fragment } from "react";
-import { Grid } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Container,
+  Divider,
+  Grid,
+  Stack,
+  Toolbar,
+} from "@mui/material";
+import Link from "next/link";
+import styled from "@emotion/styled";
 
-function MyApp({ Component, pageProps }: AppProps) {
+const navItems = [
+  { text: "Home", href: "/" },
+  { text: "Stats", href: "/stats" },
+  { text: "Settings", href: "/settings" },
+];
+
+export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Fragment>
       <header></header>
@@ -13,6 +29,20 @@ function MyApp({ Component, pageProps }: AppProps) {
             &nbsp;
           </Grid>
           <Grid item xs={10} md={8} lg={6}>
+            <MainContainer>
+              <Stack
+                direction="row"
+                spacing={2}
+                justifyContent="flex-end"
+                alignItems="center"
+              >
+                {navItems.map((item) => (
+                  <Link key={item.text} href={`/${item.href}`}>
+                    {item.text}
+                  </Link>
+                ))}
+              </Stack>
+            </MainContainer>
             <Component {...pageProps} />
           </Grid>
           <Grid item xs lg={3}>
@@ -25,4 +55,6 @@ function MyApp({ Component, pageProps }: AppProps) {
   );
 }
 
-export default MyApp;
+const MainContainer = styled.div`
+  padding: 10px;
+`;

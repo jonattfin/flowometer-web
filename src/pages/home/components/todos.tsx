@@ -6,8 +6,9 @@ import {
   ListItem,
   ListItemText,
   IconButton,
+  ListItemSecondaryAction,
 } from "@mui/material";
-import { Fragment, useEffect, useReducer, useState } from "react";
+import { Fragment, useEffect, useReducer } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { pink } from "@mui/material/colors";
@@ -15,51 +16,64 @@ import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import styled from "@emotion/styled";
 
 import { reducer, initialState, ActionTypeValue } from "./todos-reducer";
+import { TimerState } from "./timer-reducer";
 
-export type TodosProps = {};
+export type TodosProps = {
+  todo: string;
+  timerState: TimerState;
+  onSelectedTodoChanged: (text: string) => void;
+};
 
 export default function Todos(props: TodosProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { currentTodo, selectedTodoIndex, todos } = state;
+  const { currentTodo, todos } = state;
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (props.timerState == TimerState.Stopped) {
+      onDecrement(props.todo);
+    }
+  }, [props.timerState]);
+
+  function onChange(event: React.ChangeEvent<HTMLInputElement>) {
     dispatch({
       actionType: ActionTypeValue.ChangeDefaultTodo,
       payload: event.target.value,
     });
-  };
+  }
 
-  const handleListItemClick = (
+  function onClick(
     _event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     index: number
-  ) => {
-    dispatch({
-      actionType: ActionTypeValue.ChangeSelectedTodo,
-      payload: index,
-    });
-  };
+  ) {
+    if (props.timerState != TimerState.Stopped) {
+      return;
+    }
 
-  const handleOnAdd = () => {
+    props.onSelectedTodoChanged(todos[index].todo);
+  }
+
+  function onAdd() {
     dispatch({ actionType: ActionTypeValue.AddTodo, payload: undefined });
-  };
+  }
 
-  const handleOnIncrease = (todo: string) => {
+  function onIncrement(todo: string) {
     dispatch({
       actionType: ActionTypeValue.IncreaseCounter,
       payload: todo,
     });
-  };
+  }
 
-  const handleOnDecrease = (todo: string) => {
+  function onDecrement(todo: string) {
     dispatch({
       actionType: ActionTypeValue.DecreaseCounter,
       payload: todo,
     });
-  };
+  }
 
-  const handleOnDelete = (todo: string) => {
+  function onDelete(todo: string) {
+    props.onSelectedTodoChanged("");
     dispatch({ actionType: ActionTypeValue.DeleteTodo, payload: todo });
-  };
+  }
 
   return (
     <Stack spacing={1}>
@@ -71,11 +85,11 @@ export default function Todos(props: TodosProps) {
           size="small"
           fullWidth
           value={currentTodo}
-          onChange={handleChange}
+          onChange={onChange}
         />
         <Button
           variant="contained"
-          onClick={handleOnAdd}
+          onClick={onAdd}
           disabled={currentTodo == ""}
         >
           Add
@@ -89,15 +103,17 @@ export default function Todos(props: TodosProps) {
               button
               key={`todo_${index}`}
               divider
-              selected={selectedTodoIndex === index}
-              onClick={(event) => handleListItemClick(event, index)}
-              secondaryAction={
+              selected={props.todo === todo}
+              onClick={(event) => onClick(event, index)}
+            >
+              <ListItemText primary={todo}></ListItemText>
+              <ListItemSecondaryAction>
                 <Fragment>
                   [{count}]
                   <IconButton
                     edge="end"
                     aria-label="delete"
-                    onClick={() => handleOnIncrease(todo)}
+                    onClick={() => onIncrement(todo)}
                   >
                     <AddCircleIcon color="success" />
                   </IconButton>
@@ -105,21 +121,23 @@ export default function Todos(props: TodosProps) {
                     edge="end"
                     aria-label="delete"
                     disabled={count == 1}
-                    onClick={() => handleOnDecrease(todo)}
+                    onClick={() => onDecrement(todo)}
                   >
                     <RemoveCircleOutlineIcon color="success" />
                   </IconButton>
                   <IconButton
                     edge="end"
                     aria-label="delete"
-                    onClick={() => handleOnDelete(todo)}
+                    onClick={() => onDelete(todo)}
+                    disabled={
+                      props.timerState !== TimerState.Stopped &&
+                      todo === props.todo
+                    }
                   >
                     <DeleteIcon sx={{ color: pink[500] }} />
                   </IconButton>
                 </Fragment>
-              }
-            >
-              <ListItemText primary={todo}></ListItemText>
+              </ListItemSecondaryAction>
             </ListItem>
           )
         )}

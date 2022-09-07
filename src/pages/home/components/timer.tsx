@@ -5,11 +5,14 @@ import { padStart } from "lodash";
 import { ActionType, initialState, reducer, TimerState } from "./timer-reducer";
 
 type TimerProps = {
-  text?: string;
+  todo?: string;
+  onTodoStarted: (timerState: TimerState) => void;
 };
 
-export default function Timer({ text }: TimerProps) {
+export default function Timer({ todo, onTodoStarted }: TimerProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  const { newState, minutes, seconds } = calculateState(state);
 
   useEffect(() => {
     if ([TimerState.Stopped, TimerState.Paused].includes(state.currentState))
@@ -21,62 +24,54 @@ export default function Timer({ text }: TimerProps) {
     return () => clearInterval(interval);
   }, [state.currentState]);
 
-  const renderContent = () => {
-    let newState: ActionType;
+  useEffect(() => {
+    onTodoStarted(state.currentState);
+  }, [state.currentState]);
 
-    switch (state.currentState) {
-      case TimerState.Started:
-      case TimerState.Paused: {
-        newState = ActionType.Stop;
-        break;
-      }
-      default: {
-        newState = ActionType.Start;
-        break;
-      }
+  useEffect(() => {
+    if (minutes === 0 && seconds === 0) {
+      dispatch({ type: ActionType.Stop });
     }
+  }, [minutes, seconds]);
 
-    const { minutes, seconds } = getMinutesAndSeconds(state.seconds);
-
-    return (
-      <Stack spacing={2} justifyContent="center" alignItems="center">
-        <TimeWrapperDiv>{`${minutes} : ${seconds}`}</TimeWrapperDiv>
-        <TitleWrapperDiv>{`Current task: ${text || "N/A"}`}</TitleWrapperDiv>
-        <Stack
-          direction="row"
-          spacing={2}
-          justifyContent="center"
-          alignItems="center"
+  return (
+    <Stack spacing={2} justifyContent="center" alignItems="center">
+      <TimeWrapperDiv>{`${format(minutes)} : ${format(
+        seconds
+      )}`}</TimeWrapperDiv>
+      <TitleWrapperDiv>{`Current task: ${todo || "N/A"}`}</TitleWrapperDiv>
+      <Stack
+        direction="row"
+        spacing={2}
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Button
+          variant="contained"
+          onClick={() => dispatch({ type: newState })}
         >
+          {newState}
+        </Button>
+
+        {state.currentState == TimerState.Started && (
           <Button
             variant="contained"
-            onClick={() => dispatch({ type: newState })}
+            onClick={() => dispatch({ type: ActionType.Pause })}
           >
-            {newState}
+            Pause
           </Button>
-
-          {state.currentState == TimerState.Started && (
-            <Button
-              variant="contained"
-              onClick={() => dispatch({ type: ActionType.Pause })}
-            >
-              Pause
-            </Button>
-          )}
-          {state.currentState == TimerState.Paused && (
-            <Button
-              variant="contained"
-              onClick={() => dispatch({ type: ActionType.Resume })}
-            >
-              Resume
-            </Button>
-          )}
-        </Stack>
+        )}
+        {state.currentState == TimerState.Paused && (
+          <Button
+            variant="contained"
+            onClick={() => dispatch({ type: ActionType.Resume })}
+          >
+            Resume
+          </Button>
+        )}
       </Stack>
-    );
-  };
-
-  return <div>{renderContent()}</div>;
+    </Stack>
+  );
 }
 
 // styled components
@@ -91,6 +86,25 @@ const TitleWrapperDiv = styled.div`
 
 // helpers
 
+function calculateState(state: any) {
+  let newState: ActionType;
+
+  switch (state.currentState) {
+    case TimerState.Started:
+    case TimerState.Paused: {
+      newState = ActionType.Stop;
+      break;
+    }
+    default: {
+      newState = ActionType.Start;
+      break;
+    }
+  }
+
+  const { minutes, seconds } = getMinutesAndSeconds(state.seconds);
+  return { newState, minutes, seconds };
+}
+
 function getMinutesAndSeconds(currentSeconds: number) {
   const MINUTES_PER_HOUR = 60;
 
@@ -104,11 +118,11 @@ function getMinutesAndSeconds(currentSeconds: number) {
   const remainingSeconds = Math.floor(remainingTotalSeconds % MINUTES_PER_HOUR);
 
   return {
-    minutes: format(remainingMinutes),
-    seconds: format(remainingSeconds),
+    minutes: remainingMinutes,
+    seconds: remainingSeconds,
   };
+}
 
-  function format(value: number) {
-    return padStart(value.toString(), 2, "0");
-  }
+function format(value: number) {
+  return padStart(value.toString(), 2, "0");
 }

@@ -2,7 +2,6 @@ import { cloneDeep } from "lodash";
 
 export type TodoType = {
   currentTodo: string;
-  selectedTodoIndex: number;
   todos: {
     todo: string;
     count: number;
@@ -16,7 +15,6 @@ export type ActionType = {
 
 export const initialState: TodoType = {
   currentTodo: "",
-  selectedTodoIndex: -1,
   todos: [
     { todo: "x", count: 1 },
     { todo: "y", count: 1 },
@@ -26,7 +24,6 @@ export const initialState: TodoType = {
 
 export enum ActionTypeValue {
   ChangeDefaultTodo,
-  ChangeSelectedTodo,
   AddTodo,
   IncreaseCounter,
   DecreaseCounter,
@@ -44,11 +41,7 @@ export const reducer = (state: TodoType, action: ActionType) => {
 
       break;
     }
-    case ActionTypeValue.ChangeSelectedTodo: {
-      clonedState.selectedTodoIndex = action.payload;
 
-      break;
-    }
     case ActionTypeValue.AddTodo: {
       clonedState.todos.push({ todo: clonedState.currentTodo, count: 1 });
       clonedState.currentTodo = "";
@@ -73,7 +66,6 @@ export const reducer = (state: TodoType, action: ActionType) => {
       break;
     }
     case ActionTypeValue.DeleteTodo: {
-      clonedState.selectedTodoIndex = -1;
       clonedState.todos = clonedState.todos.filter(
         (item: any) => item.todo != payload
       );
