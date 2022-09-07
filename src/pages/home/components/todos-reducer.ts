@@ -39,10 +39,6 @@ export const reducer = (state: TodoType, action: ActionType) => {
       };
     }
 
-    case ActionTypeValue.InitState: {
-      return action.payload; // this sets the state
-    }
-
     case ActionTypeValue.AddTodo: {
       return {
         currentTodo: "",
