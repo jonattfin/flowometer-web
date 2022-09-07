@@ -15,8 +15,7 @@ import { pink } from "@mui/material/colors";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import styled from "@emotion/styled";
 
-import { useContext } from "react";
-import { AppContext } from "./../../_shared_/app-context";
+import { useTodos } from "./../../_shared_/app-context";
 
 import { ActionTypeValue } from "./todos-reducer";
 import { TimerState } from "./timer-reducer";
@@ -28,7 +27,7 @@ export type TodosProps = {
 };
 
 export default function Todos(props: TodosProps) {
-  const { todosState: state, todosDispatch: dispatch } = useContext(AppContext);
+  const { state, dispatch } = useTodos();
 
   useEffect(() => {
     if (props.timerState == TimerState.Stopped) {

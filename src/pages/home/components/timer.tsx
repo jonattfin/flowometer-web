@@ -3,8 +3,7 @@ import { Button, Stack } from "@mui/material";
 import { useEffect } from "react";
 import { padStart } from "lodash";
 import { ActionType, TimerState } from "./timer-reducer";
-import { useContext } from "react";
-import { AppContext } from "./../../_shared_/app-context";
+import { useTimer } from "./../../_shared_/app-context";
 
 type TimerProps = {
   todo?: string;
@@ -12,7 +11,7 @@ type TimerProps = {
 };
 
 export default function Timer({ todo, onTodoStarted }: TimerProps) {
-  const { timerState: state, timerDispatch: dispatch } = useContext(AppContext);
+  const { state, dispatch } = useTimer();
 
   const { newState, minutes, seconds } = calculateState(state);
 
