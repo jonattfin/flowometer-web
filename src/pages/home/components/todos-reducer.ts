@@ -1,5 +1,3 @@
-import { json } from "stream/consumers";
-
 export type TodoType = {
   currentTodo: string;
   todos: {
@@ -22,34 +20,12 @@ export const initialState: TodoType = {
   ],
 };
 
-export function loadTodos(): TodoType {
-  try {
-    const todos = localStorage.getItem("todos") || "";
-    const todoState = JSON.parse(todos) as TodoType;
-    return todoState;
-  } catch (ex) {
-    return {
-      currentTodo: "",
-      todos: [
-        { todo: "x", count: 1 },
-        { todo: "y", count: 1 },
-      ],
-    };
-  }
-}
-
-export function saveTodos(todos: TodoType) {
-  const json = JSON.stringify(todos);
-  localStorage.setItem("todos", json);
-}
-
 export enum ActionTypeValue {
   ChangeDefaultTodo,
   AddTodo,
   IncreaseCounter,
   DecreaseCounter,
   DeleteTodo,
-  InitState,
 }
 
 export const reducer = (state: TodoType, action: ActionType) => {

@@ -8,20 +8,17 @@ import {
   IconButton,
   ListItemSecondaryAction,
 } from "@mui/material";
-import { Fragment, useEffect, useReducer } from "react";
+import { Fragment, useEffect } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { pink } from "@mui/material/colors";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import styled from "@emotion/styled";
 
-import {
-  reducer,
-  initialState,
-  ActionTypeValue,
-  loadTodos,
-  saveTodos,
-} from "./todos-reducer";
+import { useContext } from "react";
+import { AppContext } from "./../../_shared_/app-context";
+
+import { ActionTypeValue } from "./todos-reducer";
 import { TimerState } from "./timer-reducer";
 
 export type TodosProps = {
@@ -31,20 +28,7 @@ export type TodosProps = {
 };
 
 export default function Todos(props: TodosProps) {
-  const [state, dispatch] = useReducer(reducer, initialState);
-
-  // Load the todos from storage
-  useEffect(() => {
-    dispatch({
-      actionType: ActionTypeValue.InitState,
-      payload: loadTodos(),
-    });
-  }, []);
-
-  // Save the todos in storage
-  useEffect(() => {
-    saveTodos(state);
-  }, [state]);
+  const { todosState: state, todosDispatch: dispatch } = useContext(AppContext);
 
   useEffect(() => {
     if (props.timerState == TimerState.Stopped) {
