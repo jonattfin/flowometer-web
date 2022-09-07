@@ -15,7 +15,13 @@ import { pink } from "@mui/material/colors";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import styled from "@emotion/styled";
 
-import { reducer, initialState, ActionTypeValue } from "./todos-reducer";
+import {
+  reducer,
+  initialState,
+  ActionTypeValue,
+  loadTodos,
+  saveTodos,
+} from "./todos-reducer";
 import { TimerState } from "./timer-reducer";
 
 export type TodosProps = {
@@ -26,7 +32,19 @@ export type TodosProps = {
 
 export default function Todos(props: TodosProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { currentTodo, todos } = state;
+
+  // Load the todos from storage
+  useEffect(() => {
+    dispatch({
+      actionType: ActionTypeValue.InitState,
+      payload: loadTodos(),
+    });
+  }, []);
+
+  // Save the todos in storage
+  useEffect(() => {
+    saveTodos(state);
+  }, [state]);
 
   useEffect(() => {
     if (props.timerState == TimerState.Stopped) {
@@ -49,7 +67,7 @@ export default function Todos(props: TodosProps) {
       return;
     }
 
-    props.onSelectedTodoChanged(todos[index].todo);
+    props.onSelectedTodoChanged(state.todos[index].todo);
   }
 
   function onAdd() {
@@ -77,20 +95,20 @@ export default function Todos(props: TodosProps) {
 
   return (
     <Stack spacing={1}>
-      <TitleWrapper>Task List ({todos.length})</TitleWrapper>
+      <TitleWrapper>Task List ({state.todos.length})</TitleWrapper>
       <Stack spacing={1} direction="row">
         <TextField
           label="Add New Task"
           variant="outlined"
           size="small"
           fullWidth
-          value={currentTodo}
+          value={state.currentTodo}
           onChange={onChange}
         />
         <Button
           variant="contained"
           onClick={onAdd}
-          disabled={currentTodo == ""}
+          disabled={state.currentTodo == ""}
         >
           Add
         </Button>
