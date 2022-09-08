@@ -15,7 +15,7 @@ import { pink } from "@mui/material/colors";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import styled from "@emotion/styled";
 
-import { useTodos } from "./../../_shared_/app-context";
+import { useTimerDuration, useTodos } from "./../../_shared_/app-context";
 
 import { ActionTypeValue } from "./todos-reducer";
 import { TimerState } from "./timer-reducer";
@@ -28,12 +28,7 @@ export type TodosProps = {
 
 export default function Todos(props: TodosProps) {
   const { state, dispatch } = useTodos();
-
-  useEffect(() => {
-    if (props.timerState == TimerState.Stopped) {
-      onDecrement(props.todo);
-    }
-  }, [props.timerState]);
+  const { state: timerDuration } = useTimerDuration();
 
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
     dispatch({
@@ -76,12 +71,38 @@ export default function Todos(props: TodosProps) {
     dispatch({ actionType: ActionTypeValue.DeleteTodo, payload: todo });
   }
 
+  function getTime(items: any[]) {
+    const totalMinutes = items.reduce(
+      (prevValue: number, currentValue: any) => prevValue + currentValue * timerDuration,
+      0
+    );
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = Math.floor(totalMinutes % 60);
+
+    return { hours, minutes };
+  }
+
+  const { hours: remainingHours, minutes: remainingMinutes } = getTime(
+    state.todos.map((t: any) => t.count)
+  );
+  const { hours: completedHours, minutes: completedMinutes } = getTime(
+    state.completedTodos.map((t: any) => t.completed)
+  );
+
+  const remainingTodos = state.todos.filter((t: any) => t.count >= 1);
+  const completedTodos = state.completedTodos;
+
   return (
     <Stack spacing={1}>
-      <TitleWrapper>Task List ({state.todos.length})</TitleWrapper>
+      <WrapperDiv>
+        Todo list ({remainingTodos.length}) [{remainingHours}h :{" "}
+        {remainingMinutes}
+        m]
+      </WrapperDiv>
       <Stack spacing={1} direction="row">
         <TextField
-          label="Add New Task"
+          label="Add new todo"
           variant="outlined"
           size="small"
           fullWidth
@@ -96,59 +117,89 @@ export default function Todos(props: TodosProps) {
           Add
         </Button>
       </Stack>
-
-      <List>
-        {state.todos.map(
-          ({ todo, count }: { todo: string; count: number }, index: number) => (
-            <ListItem
-              button
-              key={`todo_${index}`}
-              divider
-              selected={props.todo === todo}
-              onClick={(event) => onClick(event, index)}
-            >
-              <ListItemText primary={todo}></ListItemText>
-              <ListItemSecondaryAction>
-                <Fragment>
-                  [{count}]
-                  <IconButton
-                    edge="end"
-                    aria-label="delete"
-                    onClick={() => onIncrement(todo)}
-                  >
-                    <AddCircleIcon color="success" />
-                  </IconButton>
-                  <IconButton
-                    edge="end"
-                    aria-label="delete"
-                    disabled={count == 1}
-                    onClick={() => onDecrement(todo)}
-                  >
-                    <RemoveCircleOutlineIcon color="success" />
-                  </IconButton>
-                  <IconButton
-                    edge="end"
-                    aria-label="delete"
-                    onClick={() => onDelete(todo)}
-                    disabled={
-                      props.timerState !== TimerState.Stopped &&
-                      todo === props.todo
-                    }
-                  >
-                    <DeleteIcon sx={{ color: pink[500] }} />
-                  </IconButton>
-                </Fragment>
-              </ListItemSecondaryAction>
-            </ListItem>
-          )
-        )}
-      </List>
+      {remainingTodos.length == 0 && (
+        <WrapperDiv>Todo list is empty.</WrapperDiv>
+      )}
+      {remainingTodos.length > 0 && (
+        <List>
+          {remainingTodos.map(
+            (
+              { todo, count }: { todo: string; count: number },
+              index: number
+            ) => (
+              <ListItem
+                button
+                key={`todo_${index}`}
+                divider
+                selected={props.todo === todo}
+                onClick={(event) => onClick(event, index)}
+              >
+                <ListItemText primary={todo}></ListItemText>
+                <ListItemSecondaryAction>
+                  <Fragment>
+                    [{count}]
+                    <IconButton
+                      edge="end"
+                      aria-label="delete"
+                      onClick={() => onIncrement(todo)}
+                    >
+                      <AddCircleIcon color="success" />
+                    </IconButton>
+                    <IconButton
+                      edge="end"
+                      aria-label="delete"
+                      disabled={count == 1}
+                      onClick={() => onDecrement(todo)}
+                    >
+                      <RemoveCircleOutlineIcon color="success" />
+                    </IconButton>
+                    <IconButton
+                      edge="end"
+                      aria-label="delete"
+                      onClick={() => onDelete(todo)}
+                      disabled={
+                        props.timerState !== TimerState.Stopped &&
+                        todo === props.todo
+                      }
+                    >
+                      <DeleteIcon sx={{ color: pink[500] }} />
+                    </IconButton>
+                  </Fragment>
+                </ListItemSecondaryAction>
+              </ListItem>
+            )
+          )}
+        </List>
+      )}
+      {completedTodos.length > 0 && (
+        <>
+          <WrapperDiv>
+            Completed todo list ({completedTodos.length}) [{completedHours}h :{" "}
+            {completedMinutes}m]
+          </WrapperDiv>
+          <List>
+            {completedTodos.map(
+              (
+                { todo, completed }: { todo: string; completed: number },
+                index: number
+              ) => (
+                <ListItem button key={`completed_todo_${index}`} divider>
+                  <ListItemText primary={todo}></ListItemText>
+                  <ListItemSecondaryAction>
+                    <Fragment>[{completed}]</Fragment>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              )
+            )}
+          </List>
+        </>
+      )}
     </Stack>
   );
 }
 
 // styled components
 
-const TitleWrapper = styled.div`
+const WrapperDiv = styled.div`
   text-align: center;
 `;

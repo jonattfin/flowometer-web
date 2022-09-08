@@ -4,6 +4,10 @@ export type TodoType = {
     todo: string;
     count: number;
   }[];
+  completedTodos: {
+    todo: string;
+    completed: number;
+  }[];
 };
 
 export type ActionType = {
@@ -13,11 +17,8 @@ export type ActionType = {
 
 export const initialState: TodoType = {
   currentTodo: "",
-  todos: [
-    { todo: "x", count: 1 },
-    { todo: "y", count: 1 },
-    { todo: "z", count: 1 },
-  ],
+  todos: [],
+  completedTodos: [],
 };
 
 export enum ActionTypeValue {
@@ -26,6 +27,7 @@ export enum ActionTypeValue {
   IncreaseCounter,
   DecreaseCounter,
   DeleteTodo,
+  CompleteTodo,
 }
 
 export const reducer = (state: TodoType, action: ActionType) => {
@@ -34,19 +36,38 @@ export const reducer = (state: TodoType, action: ActionType) => {
   switch (actionType) {
     case ActionTypeValue.ChangeDefaultTodo: {
       return {
+        ...state,
         currentTodo: payload,
-        todos: [...state.todos],
       };
     }
 
     case ActionTypeValue.AddTodo: {
       return {
+        ...state,
         currentTodo: "",
         todos: [...state.todos, { todo: state.currentTodo, count: 1 }],
       };
     }
+
+    case ActionTypeValue.CompleteTodo: {
+      let completedTodos = [...state.completedTodos];
+      if (completedTodos.find((t) => t.todo === payload)) {
+        completedTodos = completedTodos.map((t) =>
+          t.todo == payload ? { ...t, completed: t.completed + 1 } : t
+        );
+      } else {
+        completedTodos.push({ todo: payload, completed: 1 });
+      }
+
+      return {
+        ...state,
+        completedTodos,
+      };
+    }
+
     case ActionTypeValue.IncreaseCounter: {
       return {
+        ...state,
         currentTodo: state.currentTodo,
         todos: state.todos.map((t) =>
           t.todo == action.payload ? { ...t, count: t.count + 1 } : t
@@ -55,6 +76,7 @@ export const reducer = (state: TodoType, action: ActionType) => {
     }
     case ActionTypeValue.DecreaseCounter: {
       return {
+        ...state,
         currentTodo: state.currentTodo,
         todos: state.todos.map((t) =>
           t.todo == action.payload ? { ...t, count: t.count - 1 } : t
@@ -63,6 +85,7 @@ export const reducer = (state: TodoType, action: ActionType) => {
     }
     case ActionTypeValue.DeleteTodo: {
       return {
+        ...state,
         currentTodo: state.currentTodo,
         todos: state.todos.filter((t) => t.todo !== payload),
       };

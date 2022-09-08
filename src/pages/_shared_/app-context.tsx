@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useReducer, useContext } from "react";
 
 import {
@@ -11,14 +11,20 @@ import {
   initialState as timerInitialState,
 } from "../home/components/timer-reducer";
 
+const DefaultTimerDuration = 25;
+
 type AppContextType = {
+  timerDuration: number;
+  setTimerDuration?: any;
   todosState?: any;
   todosDispatch?: any;
   timerState?: any;
   timerDispatch?: any;
 };
 
-const initialContext: AppContextType = {};
+const initialContext: AppContextType = {
+  timerDuration: DefaultTimerDuration,
+};
 
 const AppContext = React.createContext(initialContext);
 
@@ -32,9 +38,18 @@ export function AppProvider(props: any) {
     timerInitialState
   );
 
+  const [timerDuration, setTimerDuration] = useState(DefaultTimerDuration);
+
   return (
     <AppContext.Provider
-      value={{ todosState, todosDispatch, timerState, timerDispatch }}
+      value={{
+        todosState,
+        todosDispatch,
+        timerState,
+        timerDispatch,
+        timerDuration,
+        setTimerDuration,
+      }}
     >
       {props.children}
     </AppContext.Provider>
@@ -55,4 +70,10 @@ export function useTimer() {
     throw new Error("useTimer must be used within an AppProvider");
   }
   return { state: timerState, dispatch: timerDispatch };
+}
+
+export function useTimerDuration() {
+  const { timerDuration, setTimerDuration } = useContext(AppContext);
+
+  return { state: timerDuration, setTimerDuration };
 }

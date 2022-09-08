@@ -3,7 +3,12 @@ import { Button, Stack } from "@mui/material";
 import { useEffect } from "react";
 import { padStart } from "lodash";
 import { ActionType, TimerState } from "./timer-reducer";
-import { useTimer } from "./../../_shared_/app-context";
+import {
+  useTimer,
+  useTimerDuration,
+  useTodos,
+} from "./../../_shared_/app-context";
+import { ActionTypeValue } from "./todos-reducer";
 
 type TimerProps = {
   todo?: string;
@@ -12,8 +17,10 @@ type TimerProps = {
 
 export default function Timer({ todo, onTodoStarted }: TimerProps) {
   const { state, dispatch } = useTimer();
+  const { dispatch: todosDispatch } = useTodos();
+  const { state: timerDuration } = useTimerDuration();
 
-  const { newState, minutes, seconds } = calculateState(state);
+  const { newState, minutes, seconds } = calculateState(state, timerDuration);
 
   useEffect(() => {
     if ([TimerState.Stopped, TimerState.Paused].includes(state.currentState))
@@ -39,8 +46,8 @@ export default function Timer({ todo, onTodoStarted }: TimerProps) {
     <Stack spacing={2} justifyContent="center" alignItems="center">
       <TimeWrapperDiv>{`${format(minutes)} : ${format(
         seconds
-      )}`}</TimeWrapperDiv>
-      <TitleWrapperDiv>{`Current task: ${todo || "N/A"}`}</TitleWrapperDiv>
+      )}m`}</TimeWrapperDiv>
+      <TitleWrapperDiv>{`Current todo: ${todo || "N/A"}`}</TitleWrapperDiv>
       <Stack
         direction="row"
         spacing={2}
@@ -49,7 +56,20 @@ export default function Timer({ todo, onTodoStarted }: TimerProps) {
       >
         <Button
           variant="contained"
-          onClick={() => dispatch({ type: newState })}
+          onClick={() => {
+            dispatch({ type: newState });
+            if (newState === ActionType.Stop) {
+              todosDispatch({
+                actionType: ActionTypeValue.CompleteTodo,
+                payload: todo,
+              });
+              todosDispatch({
+                actionType: ActionTypeValue.DecreaseCounter,
+                payload: todo,
+              });
+              todosDispatch({});
+            }
+          }}
         >
           {newState}
         </Button>
@@ -87,7 +107,7 @@ const TitleWrapperDiv = styled.div`
 
 // helpers
 
-function calculateState(state: any) {
+function calculateState(state: any, timerDuration: number) {
   let newState: ActionType;
 
   switch (state.currentState) {
@@ -102,14 +122,17 @@ function calculateState(state: any) {
     }
   }
 
-  const { minutes, seconds } = getMinutesAndSeconds(state.seconds);
+  const { minutes, seconds } = getMinutesAndSeconds(
+    state.seconds,
+    timerDuration
+  );
   return { newState, minutes, seconds };
 }
 
-function getMinutesAndSeconds(currentSeconds: number) {
+function getMinutesAndSeconds(currentSeconds: number, timerDuration: number) {
   const MINUTES_PER_HOUR = 60;
 
-  const minutes = 45;
+  const minutes = timerDuration;
   const seconds = 0;
 
   const totalSeconds = minutes * MINUTES_PER_HOUR + seconds;

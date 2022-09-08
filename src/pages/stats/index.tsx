@@ -1,44 +1,29 @@
 import styled from "@emotion/styled";
 import ReactECharts from "echarts-for-react";
-import { random } from "lodash";
+import { useTodos } from "../_shared_/app-context";
 
 export default function Stats() {
-  return <ReactECharts option={getOption()} />;
-}
+  const { state } = useTodos();
 
-function buildData() {
-  return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-}
-
-function buildSeries() {
-  const tasks = [
-    { name: "x", count: 10 },
-    { name: "y", count: 5 },
-    { name: "z", count: 4 },
-  ];
-
-  function getData() {
-    const data = buildData();
-    return data.map(() => random(50, 300));
+  if (state.completedTodos.length == 0) {
+    return (
+      <WrapperDiv>
+        You didn't finished any todos today. What are you waiting for?
+      </WrapperDiv>
+    );
   }
 
-  return tasks.map((t) => {
-    return {
-      name: t.name,
-      type: "bar",
-      stack: "total",
-      label: {
-        show: true,
-      },
-      emphasis: {
-        focus: "series",
-      },
-      data: getData(),
-    };
-  });
+  return <ReactECharts option={getOption(state.completedTodos)} />;
 }
 
-function getOption() {
+const WrapperDiv = styled.div`
+  text-align: center;
+`;
+
+function getOption(todos: any[]) {
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const series = buildSeries(days, todos);
+
   return {
     tooltip: {
       trigger: "axis",
@@ -59,8 +44,28 @@ function getOption() {
     },
     yAxis: {
       type: "category",
-      data: buildData(),
+      data: days,
     },
-    series: buildSeries(),
+    series,
   };
+
+  function buildSeries(days: string[], todos: any[]) {
+    const currentDay = new Date().getDay();
+    return todos.map((t) => {
+      return {
+        name: t.todo,
+        type: "bar",
+        stack: "total",
+        label: {
+          show: true,
+        },
+        emphasis: {
+          focus: "series",
+        },
+        data: days.map((d, dayIndex) =>
+          dayIndex === currentDay - 1 ? t.completed : 0
+        ),
+      };
+    });
+  }
 }
