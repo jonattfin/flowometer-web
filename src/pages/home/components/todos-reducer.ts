@@ -1,3 +1,5 @@
+import produce from "immer";
+
 export type TodoType = {
   currentTodo: string;
   todos: {
@@ -35,60 +37,53 @@ export const reducer = (state: TodoType, action: ActionType) => {
 
   switch (actionType) {
     case ActionTypeValue.ChangeDefaultTodo: {
-      return {
-        ...state,
-        currentTodo: payload,
-      };
+      return produce(state, (draftState) => {
+        draftState.currentTodo = action.payload;
+      });
     }
 
     case ActionTypeValue.AddTodo: {
-      return {
-        ...state,
-        currentTodo: "",
-        todos: [...state.todos, { todo: state.currentTodo, count: 1 }],
-      };
+      return produce(state, (draftState) => {
+        draftState.currentTodo = "";
+        draftState.todos.push({ todo: state.currentTodo, count: 1 });
+      });
     }
 
     case ActionTypeValue.CompleteTodo: {
-      let completedTodos = [...state.completedTodos];
-      if (completedTodos.find((t) => t.todo === payload)) {
-        completedTodos = completedTodos.map((t) =>
-          t.todo == payload ? { ...t, completed: t.completed + 1 } : t
+      return produce(state, (draftState) => {
+        const foundItem = draftState.completedTodos.find(
+          (t: any) => t.todo === payload
         );
-      } else {
-        completedTodos.push({ todo: payload, completed: 1 });
-      }
-
-      return {
-        ...state,
-        completedTodos,
-      };
+        if (foundItem) {
+          foundItem.completed += 1;
+        } else {
+          draftState.completedTodos.push({ todo: payload, completed: 1 });
+        }
+      });
     }
 
     case ActionTypeValue.IncreaseCounter: {
-      return {
-        ...state,
-        currentTodo: state.currentTodo,
-        todos: state.todos.map((t) =>
-          t.todo == action.payload ? { ...t, count: t.count + 1 } : t
-        ),
-      };
+      return produce(state, (draftState) => {
+        const foundItem = draftState.todos.find((t: any) => t.todo === payload);
+        if (foundItem) {
+          foundItem.count += 1;
+        }
+      });
     }
     case ActionTypeValue.DecreaseCounter: {
-      return {
-        ...state,
-        currentTodo: state.currentTodo,
-        todos: state.todos.map((t) =>
-          t.todo == action.payload ? { ...t, count: t.count - 1 } : t
-        ),
-      };
+      return produce(state, (draftState) => {
+        const foundItem = draftState.todos.find((t: any) => t.todo === payload);
+        if (foundItem) {
+          foundItem.count -= 1;
+        }
+      });
     }
     case ActionTypeValue.DeleteTodo: {
-      return {
-        ...state,
-        currentTodo: state.currentTodo,
-        todos: state.todos.filter((t) => t.todo !== payload),
-      };
+      return produce(state, (draftState) => {
+        draftState.todos = draftState.todos.filter(
+          (t: any) => t.todo !== payload
+        );
+      });
     }
     default:
       return state;
