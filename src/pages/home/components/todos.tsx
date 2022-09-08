@@ -37,6 +37,8 @@ export default function Todos(props: TodosProps) {
     });
   }
 
+  
+
   function onClick(
     _event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     index: number
