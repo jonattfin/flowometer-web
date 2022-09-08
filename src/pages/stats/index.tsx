@@ -8,7 +8,7 @@ export default function Stats() {
   if (state.completedTodos.length == 0) {
     return (
       <WrapperDiv>
-        You didn't finished any todos today. What are you waiting for?
+        You didn&apos;t finished any todos today. What are you waiting for?
       </WrapperDiv>
     );
   }
