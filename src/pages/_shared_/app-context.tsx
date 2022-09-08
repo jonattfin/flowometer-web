@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useReducer, useContext } from "react";
+import React, { useState, useReducer, useContext } from "react";
 
 import {
   reducer as todosReducer,

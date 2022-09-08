@@ -23,12 +23,6 @@ export const reducer = (
   action: { type: ActionType }
 ) => {
   switch (action.type) {
-    case ActionType.Start: {
-      return {
-        ...state,
-        currentState: TimerState.Started,
-      };
-    }
     case ActionType.CountSeconds: {
       return {
         ...state,
@@ -49,6 +43,7 @@ export const reducer = (
         currentState: TimerState.Paused,
       };
     }
+    case ActionType.Start:
     case ActionType.Resume: {
       return {
         ...state,
