@@ -1,8 +1,10 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-import { Grid, Stack } from "@mui/material";
+import { Divider, Grid, Stack } from "@mui/material";
 import Link from "next/link";
 import styled from "@emotion/styled";
+import GitHubIcon from "@mui/icons-material/GitHub";
+
 import { AppProvider } from "../src/pages/_shared_/app-context";
 
 const navItems = [
@@ -33,6 +35,21 @@ export default function MyApp({ Component, pageProps }: AppProps) {
                     {item.text}
                   </Link>
                 ))}
+                <Divider />
+                <a
+                  href="https://github.com/jonattfin/flowometer-web"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <GitHubIcon fontSize="small"></GitHubIcon>
+                </a>
+                <a
+                  href="https://sonarcloud.io/summary/new_code?id=jonattfin_flowometer-web"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <img src="https://sonarcloud.io/api/project_badges/measure?project=jonattfin_flowometer-web&metric=alert_status" />
+                </a>
               </Stack>
             </MainContainer>
             <Component {...pageProps} />
