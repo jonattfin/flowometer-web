@@ -30,15 +30,6 @@ export default function Todos(props: TodosProps) {
   const { state, dispatch } = useTodos();
   const { state: timerDuration } = useTimerDuration();
 
-  function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-    dispatch({
-      actionType: ActionTypeValue.ChangeDefaultTodo,
-      payload: event.target.value,
-    });
-  }
-
-  
-
   function onClick(
     _event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     index: number
@@ -50,24 +41,6 @@ export default function Todos(props: TodosProps) {
     props.onSelectedTodoChanged(state.todos[index].todo);
   }
 
-  function onAdd() {
-    dispatch({ actionType: ActionTypeValue.AddTodo, payload: undefined });
-  }
-
-  function onIncrement(todo: string) {
-    dispatch({
-      actionType: ActionTypeValue.IncreaseCounter,
-      payload: todo,
-    });
-  }
-
-  function onDecrement(todo: string) {
-    dispatch({
-      actionType: ActionTypeValue.DecreaseCounter,
-      payload: todo,
-    });
-  }
-
   function onDelete(todo: string) {
     props.onSelectedTodoChanged("");
     dispatch({ actionType: ActionTypeValue.DeleteTodo, payload: todo });
@@ -75,7 +48,8 @@ export default function Todos(props: TodosProps) {
 
   function getTime(items: any[]) {
     const totalMinutes = items.reduce(
-      (prevValue: number, currentValue: any) => prevValue + currentValue * timerDuration,
+      (prevValue: number, currentValue: any) =>
+        prevValue + currentValue * timerDuration,
       0
     );
 
@@ -109,11 +83,21 @@ export default function Todos(props: TodosProps) {
           size="small"
           fullWidth
           value={state.currentTodo}
-          onChange={onChange}
+          onChange={(ev) =>
+            dispatch({
+              actionType: ActionTypeValue.ChangeDefaultTodo,
+              payload: ev.target.value,
+            })
+          }
         />
         <Button
           variant="contained"
-          onClick={onAdd}
+          onClick={() =>
+            dispatch({
+              actionType: ActionTypeValue.AddTodo,
+              payload: undefined,
+            })
+          }
           disabled={state.currentTodo == ""}
         >
           Add
@@ -143,7 +127,12 @@ export default function Todos(props: TodosProps) {
                     <IconButton
                       edge="end"
                       aria-label="delete"
-                      onClick={() => onIncrement(todo)}
+                      onClick={() =>
+                        dispatch({
+                          actionType: ActionTypeValue.IncreaseCounter,
+                          payload: todo,
+                        })
+                      }
                     >
                       <AddCircleIcon color="success" />
                     </IconButton>
@@ -151,7 +140,12 @@ export default function Todos(props: TodosProps) {
                       edge="end"
                       aria-label="delete"
                       disabled={count == 1}
-                      onClick={() => onDecrement(todo)}
+                      onClick={() =>
+                        dispatch({
+                          actionType: ActionTypeValue.DecreaseCounter,
+                          payload: todo,
+                        })
+                      }
                     >
                       <RemoveCircleOutlineIcon color="success" />
                     </IconButton>
