@@ -1,7 +1,7 @@
 import produce from "immer";
 
 export type TodoType = {
-  currentTodo: string;
+  selectedTodoIndex: number;
   todos: {
     todo: string;
     count: number;
@@ -13,19 +13,19 @@ export type TodoType = {
 };
 
 export type ActionType = {
-  actionType: ActionTypeValue;
+  type: ActionTypeValue;
   payload: any;
 };
 
 export const initialState: TodoType = {
-  currentTodo: "",
+  selectedTodoIndex: -1,
   todos: [],
   completedTodos: [],
 };
 
 export enum ActionTypeValue {
-  ChangeDefaultTodo,
   AddTodo,
+  SetSelectedTodoIndex,
   IncreaseCounter,
   DecreaseCounter,
   DeleteTodo,
@@ -33,55 +33,59 @@ export enum ActionTypeValue {
 }
 
 export const reducer = (state: TodoType, action: ActionType) => {
-  const { actionType, payload } = action;
+  const { type, payload } = action;
+  console.log(JSON.stringify(action));
 
-  switch (actionType) {
-    case ActionTypeValue.ChangeDefaultTodo: {
+  switch (type) {
+    case ActionTypeValue.SetSelectedTodoIndex: {
       return produce(state, (draftState) => {
-        draftState.currentTodo = action.payload;
+        draftState.selectedTodoIndex = payload;
       });
     }
 
     case ActionTypeValue.AddTodo: {
       return produce(state, (draftState) => {
-        draftState.currentTodo = "";
-        draftState.todos.push({ todo: state.currentTodo, count: 1 });
+        draftState.todos.push({ todo: action.payload, count: 1 });
       });
     }
 
     case ActionTypeValue.CompleteTodo: {
       return produce(state, (draftState) => {
+        if (payload < 0) return;
+
+        const { todo } = state.todos[payload];
+
         const foundItem = draftState.completedTodos.find(
-          (t: any) => t.todo === payload
+          (t: any) => t.todo === todo
         );
         if (foundItem) {
           foundItem.completed += 1;
         } else {
-          draftState.completedTodos.push({ todo: payload, completed: 1 });
+          draftState.completedTodos.push({ todo, completed: 1 });
         }
       });
     }
 
     case ActionTypeValue.IncreaseCounter: {
       return produce(state, (draftState) => {
-        const foundItem = draftState.todos.find((t: any) => t.todo === payload);
-        if (foundItem) {
-          foundItem.count += 1;
-        }
+        if (payload < 0) return;
+
+        draftState.todos[payload].count++;
       });
     }
     case ActionTypeValue.DecreaseCounter: {
       return produce(state, (draftState) => {
-        const foundItem = draftState.todos.find((t: any) => t.todo === payload);
-        if (foundItem) {
-          foundItem.count -= 1;
-        }
+        if (payload < 0) return;
+
+        draftState.todos[payload].count--;
       });
     }
     case ActionTypeValue.DeleteTodo: {
       return produce(state, (draftState) => {
+        if (payload < 0) return;
+
         draftState.todos = draftState.todos.filter(
-          (t: any) => t.todo !== payload
+          (t, index) => index != payload
         );
       });
     }

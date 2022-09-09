@@ -10,35 +10,35 @@ import {
 } from "./../../_shared_/app-context";
 import { ActionTypeValue } from "./todos-reducer";
 
-type TimerProps = {
-  todo?: string;
-  onTodoStarted: (timerState: TimerState) => void;
-};
+type TimerProps = {};
 
-export default function Timer({ todo, onTodoStarted }: TimerProps) {
-  const { state, dispatch } = useTimer();
-  const { dispatch: todosDispatch } = useTodos();
-  const { state: timerDuration } = useTimerDuration();
+export default function Timer({}: TimerProps) {
+  const { state: timerState, dispatch: timerDispatch } = useTimer();
+  const { state: todosState, dispatch: todosDispatch } = useTodos();
+  const { state: timerDurationState } = useTimerDuration();
 
-  const { newState, minutes, seconds } = calculateState(state, timerDuration);
+  const { todos, selectedTodoIndex } = todosState;
+
+  const { newState, minutes, seconds } = calculateState(
+    timerState,
+    timerDurationState
+  );
 
   useEffect(() => {
-    if ([TimerState.Stopped, TimerState.Paused].includes(state.currentState))
+    if (
+      [TimerState.Stopped, TimerState.Paused].includes(timerState.currentState)
+    )
       return;
 
     const interval = setInterval(() => {
-      dispatch({ type: ActionType.CountSeconds });
+      timerDispatch({ type: ActionType.CountSeconds });
     }, 1000);
     return () => clearInterval(interval);
-  }, [state.currentState]);
-
-  useEffect(() => {
-    onTodoStarted(state.currentState);
-  }, [state.currentState]);
+  }, [timerState.currentState]);
 
   useEffect(() => {
     if (minutes === 0 && seconds === 0) {
-      dispatch({ type: ActionType.Stop });
+      timerDispatch({ type: ActionType.Stop });
     }
   }, [minutes, seconds]);
 
@@ -47,7 +47,9 @@ export default function Timer({ todo, onTodoStarted }: TimerProps) {
       <TimeWrapperDiv>{`${format(minutes)} : ${format(
         seconds
       )}m`}</TimeWrapperDiv>
-      <TitleWrapperDiv>{`Current todo: ${todo || "N/A"}`}</TitleWrapperDiv>
+      <TitleWrapperDiv>{`Current todo: ${
+        selectedTodoIndex >= 0 ? todos[selectedTodoIndex].todo : "N/A"
+      }`}</TitleWrapperDiv>
       <Stack
         direction="row"
         spacing={2}
@@ -57,35 +59,38 @@ export default function Timer({ todo, onTodoStarted }: TimerProps) {
         <Button
           variant="contained"
           onClick={() => {
-            dispatch({ type: newState });
+            timerDispatch({ type: newState });
             if (newState === ActionType.Stop) {
               todosDispatch({
-                actionType: ActionTypeValue.CompleteTodo,
-                payload: todo,
+                type: ActionTypeValue.CompleteTodo,
+                payload: selectedTodoIndex,
               });
               todosDispatch({
-                actionType: ActionTypeValue.DecreaseCounter,
-                payload: todo,
+                type: ActionTypeValue.DecreaseCounter,
+                payload: selectedTodoIndex,
               });
-              todosDispatch({});
+              todosDispatch({
+                type: ActionTypeValue.SetSelectedTodoIndex,
+                payload: -1,
+              });
             }
           }}
         >
           {newState}
         </Button>
 
-        {state.currentState == TimerState.Started && (
+        {timerState.currentState == TimerState.Started && (
           <Button
             variant="contained"
-            onClick={() => dispatch({ type: ActionType.Pause })}
+            onClick={() => timerDispatch({ type: ActionType.Pause })}
           >
             Pause
           </Button>
         )}
-        {state.currentState == TimerState.Paused && (
+        {timerState.currentState == TimerState.Paused && (
           <Button
             variant="contained"
-            onClick={() => dispatch({ type: ActionType.Resume })}
+            onClick={() => timerDispatch({ type: ActionType.Resume })}
           >
             Resume
           </Button>

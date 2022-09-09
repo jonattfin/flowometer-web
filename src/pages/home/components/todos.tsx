@@ -8,42 +8,43 @@ import {
   IconButton,
   ListItemSecondaryAction,
 } from "@mui/material";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { pink } from "@mui/material/colors";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import styled from "@emotion/styled";
 
-import { useTimerDuration, useTodos } from "./../../_shared_/app-context";
+import {
+  useTimer,
+  useTimerDuration,
+  useTodos,
+} from "./../../_shared_/app-context";
 
 import { ActionTypeValue } from "./todos-reducer";
 import { TimerState } from "./timer-reducer";
 
-export type TodosProps = {
-  todo: string;
-  timerState: TimerState;
-  onSelectedTodoChanged: (text: string) => void;
-};
+export type TodosProps = {};
 
 export default function Todos(props: TodosProps) {
-  const { state, dispatch } = useTodos();
+  const [todoText, setTodoText] = useState("");
+
+  const { state: todosState, dispatch: todosDispatch } = useTodos();
+  const { state: timerState } = useTimer();
   const { state: timerDuration } = useTimerDuration();
 
   function onClick(
     _event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     index: number
   ) {
-    if (props.timerState != TimerState.Stopped) {
+    if (timerState.currentState != TimerState.Stopped) {
       return;
     }
 
-    props.onSelectedTodoChanged(state.todos[index].todo);
-  }
-
-  function onDelete(todo: string) {
-    props.onSelectedTodoChanged("");
-    dispatch({ actionType: ActionTypeValue.DeleteTodo, payload: todo });
+    todosDispatch({
+      type: ActionTypeValue.SetSelectedTodoIndex,
+      payload: index,
+    });
   }
 
   function getTime(items: any[]) {
@@ -60,14 +61,14 @@ export default function Todos(props: TodosProps) {
   }
 
   const { hours: remainingHours, minutes: remainingMinutes } = getTime(
-    state.todos.map((t: any) => t.count)
+    todosState.todos.map((t: any) => t.count)
   );
   const { hours: completedHours, minutes: completedMinutes } = getTime(
-    state.completedTodos.map((t: any) => t.completed)
+    todosState.completedTodos.map((t: any) => t.completed)
   );
 
-  const remainingTodos = state.todos.filter((t: any) => t.count >= 1);
-  const completedTodos = state.completedTodos;
+  const remainingTodos = todosState.todos.filter((t: any) => t.count >= 1);
+  const completedTodos = todosState.completedTodos;
 
   return (
     <Stack spacing={1}>
@@ -82,23 +83,20 @@ export default function Todos(props: TodosProps) {
           variant="outlined"
           size="small"
           fullWidth
-          value={state.currentTodo}
-          onChange={(ev) =>
-            dispatch({
-              actionType: ActionTypeValue.ChangeDefaultTodo,
-              payload: ev.target.value,
-            })
-          }
+          value={todoText}
+          onChange={(ev) => setTodoText(ev.target.value)}
         />
         <Button
           variant="contained"
-          onClick={() =>
-            dispatch({
-              actionType: ActionTypeValue.AddTodo,
-              payload: undefined,
-            })
-          }
-          disabled={state.currentTodo == ""}
+          onClick={() => {
+            todosDispatch({
+              type: ActionTypeValue.AddTodo,
+              payload: todoText,
+            });
+
+            setTodoText("");
+          }}
+          disabled={todoText.length == 0}
         >
           Add
         </Button>
@@ -117,7 +115,7 @@ export default function Todos(props: TodosProps) {
                 button
                 key={`todo_${index}`}
                 divider
-                selected={props.todo === todo}
+                selected={index === todosState.selectedTodoIndex}
                 onClick={(event) => onClick(event, index)}
               >
                 <ListItemText primary={todo}></ListItemText>
@@ -128,9 +126,9 @@ export default function Todos(props: TodosProps) {
                       edge="end"
                       aria-label="delete"
                       onClick={() =>
-                        dispatch({
-                          actionType: ActionTypeValue.IncreaseCounter,
-                          payload: todo,
+                        todosDispatch({
+                          type: ActionTypeValue.IncreaseCounter,
+                          payload: index,
                         })
                       }
                     >
@@ -141,9 +139,9 @@ export default function Todos(props: TodosProps) {
                       aria-label="delete"
                       disabled={count == 1}
                       onClick={() =>
-                        dispatch({
-                          actionType: ActionTypeValue.DecreaseCounter,
-                          payload: todo,
+                        todosDispatch({
+                          type: ActionTypeValue.DecreaseCounter,
+                          payload: index,
                         })
                       }
                     >
@@ -152,11 +150,17 @@ export default function Todos(props: TodosProps) {
                     <IconButton
                       edge="end"
                       aria-label="delete"
-                      onClick={() => onDelete(todo)}
-                      disabled={
-                        props.timerState !== TimerState.Stopped &&
-                        todo === props.todo
-                      }
+                      onClick={() => {
+                        todosDispatch({
+                          type: ActionTypeValue.SetSelectedTodoIndex,
+                          payload: -1,
+                        });
+                        todosDispatch({
+                          type: ActionTypeValue.DeleteTodo,
+                          payload: index,
+                        });
+                      }}
+                      disabled={timerState.currentState != TimerState.Stopped && todosState.selectedTodoIndex == index}
                     >
                       <DeleteIcon sx={{ color: pink[500] }} />
                     </IconButton>
