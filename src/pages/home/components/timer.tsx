@@ -10,9 +10,7 @@ import {
 } from "./../../_shared_/app-context";
 import { ActionTypeValue } from "./todos-reducer";
 
-type TimerProps = {};
-
-export default function Timer({}: TimerProps) {
+export default function Timer() {
   const { state: timerState, dispatch: timerDispatch } = useTimer();
   const { state: todosState, dispatch: todosDispatch } = useTodos();
   const { state: timerDurationState } = useTimerDuration();

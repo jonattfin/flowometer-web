@@ -24,9 +24,7 @@ import {
 import { ActionTypeValue } from "./todos-reducer";
 import { TimerState } from "./timer-reducer";
 
-export type TodosProps = {};
-
-export default function Todos(props: TodosProps) {
+export default function Todos() {
   const [todoText, setTodoText] = useState("");
 
   const { state: todosState, dispatch: todosDispatch } = useTodos();
@@ -160,7 +158,10 @@ export default function Todos(props: TodosProps) {
                           payload: index,
                         });
                       }}
-                      disabled={timerState.currentState != TimerState.Stopped && todosState.selectedTodoIndex == index}
+                      disabled={
+                        timerState.currentState != TimerState.Stopped &&
+                        todosState.selectedTodoIndex == index
+                      }
                     >
                       <DeleteIcon sx={{ color: pink[500] }} />
                     </IconButton>
