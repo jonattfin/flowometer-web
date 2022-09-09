@@ -5,7 +5,7 @@ import Link from "next/link";
 import styled from "@emotion/styled";
 import GitHubIcon from "@mui/icons-material/GitHub";
 
-import { AppProvider } from "../src/pages/_shared_/app-context";
+import { AppProvider } from "../src/services/providers";
 
 const navItems = [
   { text: "Home", href: "/" },

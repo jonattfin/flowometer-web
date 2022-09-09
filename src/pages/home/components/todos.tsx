@@ -19,10 +19,10 @@ import {
   useTimer,
   useTimerDuration,
   useTodos,
-} from "./../../_shared_/app-context";
+} from "../../../services/providers";
 
-import { ActionTypeValue } from "./todos-reducer";
-import { TimerState } from "./timer-reducer";
+import { ActionTypeValue } from "../../../services/reducers/todos-reducer";
+import { TimerState } from "../../../services/reducers/timer-reducer";
 
 export default function Todos() {
   const [todoText, setTodoText] = useState("");

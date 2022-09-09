@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import ReactECharts from "echarts-for-react";
-import { useTodos } from "../_shared_/app-context";
+import { useTodos } from "../../services/providers";
 
 export default function Stats() {
   const { state } = useTodos();

@@ -3,12 +3,12 @@ import React, { useState, useReducer, useContext } from "react";
 import {
   reducer as todosReducer,
   initialState as todosInitialState,
-} from "../home/components/todos-reducer";
+} from "../reducers/todos-reducer";
 
 import {
   reducer as timerReducer,
   initialState as timerInitialState,
-} from "../home/components/timer-reducer";
+} from "../reducers/timer-reducer";
 
 const DefaultTimerDuration = 25;
 

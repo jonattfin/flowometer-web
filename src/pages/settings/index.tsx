@@ -1,6 +1,6 @@
 import { Stack, TextField, Button } from "@mui/material";
 import React, { useState } from "react";
-import { useTimerDuration } from "../_shared_/app-context";
+import { useTimerDuration } from "../../services/providers";
 
 export default function Settings() {
   const { state: timerDuration, setTimerDuration } = useTimerDuration();

@@ -2,13 +2,13 @@ import styled from "@emotion/styled";
 import { Button, Stack } from "@mui/material";
 import { useEffect } from "react";
 import { padStart } from "lodash";
-import { ActionType, TimerState } from "./timer-reducer";
+import { ActionType, TimerState } from "../../../services/reducers/timer-reducer";
 import {
   useTimer,
   useTimerDuration,
   useTodos,
-} from "./../../_shared_/app-context";
-import { ActionTypeValue } from "./todos-reducer";
+} from "../../../services/providers";
+import { ActionTypeValue } from "../../../services/reducers/todos-reducer";
 
 export default function Timer() {
   const { state: timerState, dispatch: timerDispatch } = useTimer();
