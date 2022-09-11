@@ -1,2 +1,2 @@
-export { default as Timer } from './timer';
-export { default as Todos } from './todos';
+export { default as TimerComponent } from './timer-component';
+export { default as TodosComponent } from './todos-component';
