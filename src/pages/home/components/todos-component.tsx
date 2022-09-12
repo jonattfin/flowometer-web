@@ -20,22 +20,29 @@ import { TimerState } from "../../../services/reducers/timer-reducer";
 export type TodosProps = {
   todoText: string;
   onChange: (s: string) => void;
-  remainingTodos: any[];
+  remainingTodos: {
+    todoGuid: string;
+    todo: string;
+    count: number;
+  }[];
   remainingHours: number;
   remainingMinutes: number;
 
-  completedTodos: any[];
+  completedTodos: {
+    todo: string;
+    completed: number;
+  }[];
   completedHours: number;
   completedMinutes: number;
 
-  selectedTodoIndex: number;
+  selectedTodoGuid?: string;
   timerState: TimerState;
 
   onAdd: () => void;
-  onClick: (index: number) => void;
-  onIncrease: (index: number) => void;
-  onDecrease: (index: number) => void;
-  onDelete: (index: number) => void;
+  onClick: (guid: string) => void;
+  onIncrease: (guid: string) => void;
+  onDecrease: (guid: string) => void;
+  onDelete: (guid: string) => void;
 };
 
 export default function TodosComponent(props: TodosProps) {
@@ -70,47 +77,53 @@ export default function TodosComponent(props: TodosProps) {
         <List>
           {props.remainingTodos.map(
             (
-              { todo, count }: { todo: string; count: number },
+              {
+                todoGuid,
+                todo,
+                count,
+              }: { todoGuid: string; todo: string; count: number },
               index: number
-            ) => (
-              <ListItem
-                button
-                key={`todo_${index}`}
-                divider
-                selected={index === props.selectedTodoIndex}
-                onClick={(event) => props.onClick(index)}
-              >
-                <ListItemText primary={todo}></ListItemText>
-                <ListItemSecondaryAction>
-                  <Fragment>
-                    [{count}]
-                    <IconButton
-                      edge="end"
-                      onClick={() => props.onIncrease(index)}
-                    >
-                      <AddCircleIcon color="success" />
-                    </IconButton>
-                    <IconButton
-                      edge="end"
-                      disabled={count == 1}
-                      onClick={() => props.onDecrease(index)}
-                    >
-                      <RemoveCircleOutlineIcon color="success" />
-                    </IconButton>
-                    <IconButton
-                      edge="end"
-                      onClick={() => props.onDelete(index)}
-                      disabled={
-                        props.timerState != TimerState.Stopped &&
-                        props.selectedTodoIndex == index
-                      }
-                    >
-                      <DeleteIcon sx={{ color: pink[500] }} />
-                    </IconButton>
-                  </Fragment>
-                </ListItemSecondaryAction>
-              </ListItem>
-            )
+            ) => {
+              return (
+                <ListItem
+                  button
+                  key={`todo_${index}`}
+                  divider
+                  selected={todoGuid === props.selectedTodoGuid}
+                  onClick={(event) => props.onClick(todoGuid)}
+                >
+                  <ListItemText primary={todo}></ListItemText>
+                  <ListItemSecondaryAction>
+                    <Fragment>
+                      [{count}]
+                      <IconButton
+                        edge="end"
+                        onClick={() => props.onIncrease(todoGuid)}
+                      >
+                        <AddCircleIcon color="success" />
+                      </IconButton>
+                      <IconButton
+                        edge="end"
+                        disabled={count == 1}
+                        onClick={() => props.onDecrease(todoGuid)}
+                      >
+                        <RemoveCircleOutlineIcon color="success" />
+                      </IconButton>
+                      <IconButton
+                        edge="end"
+                        onClick={() => props.onDelete(todoGuid)}
+                        disabled={
+                          props.timerState != TimerState.Stopped &&
+                          props.selectedTodoGuid == todoGuid
+                        }
+                      >
+                        <DeleteIcon sx={{ color: pink[500] }} />
+                      </IconButton>
+                    </Fragment>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              );
+            }
           )}
         </List>
       )}

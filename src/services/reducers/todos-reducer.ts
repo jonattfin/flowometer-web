@@ -1,8 +1,10 @@
 import produce from "immer";
+import { v4 as uuidv4 } from "uuid";
 
 export type TodoType = {
-  selectedTodoIndex: number;
+  selectedTodoGuid?: string;
   todos: {
+    todoGuid: string;
     todo: string;
     count: number;
   }[];
@@ -18,14 +20,14 @@ export type ActionType = {
 };
 
 export const initialState: TodoType = {
-  selectedTodoIndex: -1,
+  selectedTodoGuid: undefined,
   todos: [],
   completedTodos: [],
 };
 
 export enum ActionTypeValue {
   AddTodo,
-  SetSelectedTodoIndex,
+  SetSelectedTodoGuid,
   IncreaseCounter,
   DecreaseCounter,
   DeleteTodo,
@@ -37,55 +39,60 @@ export const reducer = (state: TodoType, action: ActionType) => {
   console.log(JSON.stringify(action));
 
   switch (type) {
-    case ActionTypeValue.SetSelectedTodoIndex: {
+    case ActionTypeValue.SetSelectedTodoGuid: {
       return produce(state, (draftState) => {
-        draftState.selectedTodoIndex = payload;
+        draftState.selectedTodoGuid = payload;
       });
     }
 
     case ActionTypeValue.AddTodo: {
       return produce(state, (draftState) => {
-        draftState.todos.push({ todo: action.payload, count: 1 });
+        draftState.todos.push({
+          todo: action.payload,
+          todoGuid: uuidv4(),
+          count: 1,
+        });
       });
     }
 
     case ActionTypeValue.CompleteTodo: {
       return produce(state, (draftState) => {
-        if (payload < 0) return;
+        const todoObj = state.todos.find((t) => t.todoGuid === payload);
+        if (todoObj) {
+          const { todo } = todoObj;
 
-        const { todo } = state.todos[payload];
-
-        const foundItem = draftState.completedTodos.find(
-          (t: any) => t.todo === todo
-        );
-        if (foundItem) {
-          foundItem.completed += 1;
-        } else {
-          draftState.completedTodos.push({ todo, completed: 1 });
+          const foundItem = draftState.completedTodos.find(
+            (t: any) => t.todo === todo
+          );
+          if (foundItem) {
+            foundItem.completed += 1;
+          } else {
+            draftState.completedTodos.push({ todo, completed: 1 });
+          }
         }
       });
     }
 
     case ActionTypeValue.IncreaseCounter: {
       return produce(state, (draftState) => {
-        if (payload < 0) return;
-
-        draftState.todos[payload].count++;
+        const todoObj = draftState.todos.find((t) => t.todoGuid === payload);
+        if (todoObj) {
+          todoObj.count++;
+        }
       });
     }
     case ActionTypeValue.DecreaseCounter: {
       return produce(state, (draftState) => {
-        if (payload < 0) return;
-
-        draftState.todos[payload].count--;
+        const todoObj = draftState.todos.find((t) => t.todoGuid === payload);
+        if (todoObj) {
+          todoObj.count--;
+        }
       });
     }
     case ActionTypeValue.DeleteTodo: {
       return produce(state, (draftState) => {
-        if (payload < 0) return;
-
         draftState.todos = draftState.todos.filter(
-          (t, index) => index != payload
+          (t) => t.todoGuid != payload
         );
       });
     }

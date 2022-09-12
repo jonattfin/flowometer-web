@@ -23,14 +23,20 @@ export default function TimerComponent(props: TimerProps) {
       <TimeWrapperDiv>{`${format(props.minutes)} : ${format(
         props.seconds
       )}m`}</TimeWrapperDiv>
-      <TitleWrapperDiv>{`Current todo: ${props.currentTodo}`}</TitleWrapperDiv>
+      <TitleWrapperDiv>{`Current todo: ${
+        props.currentTodo || "N/A"
+      }`}</TitleWrapperDiv>
       <Stack
         direction="row"
         spacing={2}
         justifyContent="center"
         alignItems="center"
       >
-        <Button variant="contained" onClick={props.onClick}>
+        <Button
+          variant="contained"
+          onClick={props.onClick}
+          disabled={props.currentTodo === undefined}
+        >
           {props.newState}
         </Button>
 

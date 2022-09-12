@@ -14,14 +14,14 @@ export default function TodosContainer() {
   const { state: timerState } = useTimer();
   const { state: timerDuration } = useTimerDuration();
 
-  function onClick(index: number) {
+  function onClick(todoGuid: string) {
     if (timerState.currentState != TimerState.Stopped) {
       return;
     }
 
     todosDispatch({
-      type: ActionTypeValue.SetSelectedTodoIndex,
-      payload: index,
+      type: ActionTypeValue.SetSelectedTodoGuid,
+      payload: todoGuid,
     });
   }
 
@@ -61,30 +61,25 @@ export default function TodosContainer() {
     setTodoText("");
   };
 
-  const onIncrease = (index: number) => {
+  const onIncrease = (guid: string) => {
     todosDispatch({
       type: ActionTypeValue.IncreaseCounter,
-      payload: index,
+      payload: guid,
     });
   };
 
-  const onDecrease = (index: number) => {
+  const onDecrease = (guid: string) => {
     todosDispatch({
       type: ActionTypeValue.DecreaseCounter,
-      payload: index,
+      payload: guid,
     });
   };
 
-  const onDelete = (index: number) => {
-    todosDispatch({
-      type: ActionTypeValue.SetSelectedTodoIndex,
-      payload: -1,
-    });
+  const onDelete = (guid: string) => {
     todosDispatch({
       type: ActionTypeValue.DeleteTodo,
-      payload: index,
+      payload: guid,
     });
-    console.log("deleted " + index);
   };
 
   const props = {
@@ -98,7 +93,7 @@ export default function TodosContainer() {
     completedHours,
     completedMinutes,
 
-    selectedTodoIndex: todosState.selectedTodoIndex,
+    selectedTodoGuid: todosState.selectedTodoGuid,
     timerState: timerState.currentState,
 
     onClick,

@@ -16,7 +16,7 @@ export default function TimerContainer() {
   const { state: todosState, dispatch: todosDispatch } = useTodos();
   const { state: timerDurationState } = useTimerDuration();
 
-  const { todos, selectedTodoIndex } = todosState;
+  const { todos, selectedTodoGuid } = todosState;
 
   const { newState, minutes, seconds } = calculateState(
     timerState,
@@ -46,15 +46,15 @@ export default function TimerContainer() {
     if (newState === ActionType.Stop) {
       todosDispatch({
         type: ActionTypeValue.CompleteTodo,
-        payload: selectedTodoIndex,
+        payload: selectedTodoGuid,
       });
       todosDispatch({
         type: ActionTypeValue.DecreaseCounter,
-        payload: selectedTodoIndex,
+        payload: selectedTodoGuid,
       });
       todosDispatch({
-        type: ActionTypeValue.SetSelectedTodoIndex,
-        payload: -1,
+        type: ActionTypeValue.SetSelectedTodoGuid,
+        payload: undefined,
       });
     }
   };
@@ -67,8 +67,13 @@ export default function TimerContainer() {
     timerDispatch({ type: ActionType.Resume });
   };
 
+  const todoObj = todos.find((t: any) => t.todoGuid === selectedTodoGuid);
+  console.debug(todos);
+  console.debug(selectedTodoGuid);
+  console.debug(todoObj);
+
   const props = {
-    currentTodo: selectedTodoIndex >= 0 ? todos[selectedTodoIndex].todo : "N/A",
+    currentTodo: todoObj ? todoObj.todo : undefined,
     onClick,
     onPause,
     onResume,
