@@ -1,22 +1,21 @@
 import produce from "immer";
 import { v4 as uuidv4 } from "uuid";
 
+export type Todo = {
+  guid: string;
+  text: string;
+  count: number;
+};
+
 export type TodoType = {
   selectedTodoGuid?: string;
-  todos: {
-    todoGuid: string;
-    todo: string;
-    count: number;
-  }[];
-  completedTodos: {
-    todo: string;
-    completed: number;
-  }[];
+  todos: Todo[];
+  completedTodos: Todo[];
 };
 
 export type ActionType = {
   type: ActionTypeValue;
-  payload: any;
+  payload: string;
 };
 
 export const initialState: TodoType = {
@@ -36,7 +35,6 @@ export enum ActionTypeValue {
 
 export const reducer = (state: TodoType, action: ActionType) => {
   const { type, payload } = action;
-  console.log(JSON.stringify(action));
 
   switch (type) {
     case ActionTypeValue.SetSelectedTodoGuid: {
@@ -48,8 +46,8 @@ export const reducer = (state: TodoType, action: ActionType) => {
     case ActionTypeValue.AddTodo: {
       return produce(state, (draftState) => {
         draftState.todos.push({
-          todo: action.payload,
-          todoGuid: uuidv4(),
+          guid: uuidv4(),
+          text: action.payload,
           count: 1,
         });
       });
@@ -57,17 +55,17 @@ export const reducer = (state: TodoType, action: ActionType) => {
 
     case ActionTypeValue.CompleteTodo: {
       return produce(state, (draftState) => {
-        const todoObj = state.todos.find((t) => t.todoGuid === payload);
+        const todoObj = state.todos.find((t) => t.guid === payload);
         if (todoObj) {
-          const { todo } = todoObj;
+          const { guid, text } = todoObj;
 
           const foundItem = draftState.completedTodos.find(
-            (t: any) => t.todo === todo
+            (t) => t.text === text
           );
           if (foundItem) {
-            foundItem.completed += 1;
+            foundItem.count += 1;
           } else {
-            draftState.completedTodos.push({ todo, completed: 1 });
+            draftState.completedTodos.push({ guid, text, count: 1 });
           }
         }
       });
@@ -75,7 +73,7 @@ export const reducer = (state: TodoType, action: ActionType) => {
 
     case ActionTypeValue.IncreaseCounter: {
       return produce(state, (draftState) => {
-        const todoObj = draftState.todos.find((t) => t.todoGuid === payload);
+        const todoObj = draftState.todos.find((t) => t.guid === payload);
         if (todoObj) {
           todoObj.count++;
         }
@@ -83,7 +81,7 @@ export const reducer = (state: TodoType, action: ActionType) => {
     }
     case ActionTypeValue.DecreaseCounter: {
       return produce(state, (draftState) => {
-        const todoObj = draftState.todos.find((t) => t.todoGuid === payload);
+        const todoObj = draftState.todos.find((t) => t.guid === payload);
         if (todoObj) {
           todoObj.count--;
         }
@@ -91,9 +89,7 @@ export const reducer = (state: TodoType, action: ActionType) => {
     }
     case ActionTypeValue.DeleteTodo: {
       return produce(state, (draftState) => {
-        draftState.todos = draftState.todos.filter(
-          (t) => t.todoGuid != payload
-        );
+        draftState.todos = draftState.todos.filter((t) => t.guid != payload);
       });
     }
     default:

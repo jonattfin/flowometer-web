@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import ReactECharts from "echarts-for-react";
-import { useTodos } from "../../services/providers";
+import { useTodos } from "../../services/provider";
+import { Todo } from "../../services/reducers/todos-reducer";
 
 export default function Stats() {
   const { state } = useTodos();
@@ -20,7 +21,7 @@ const WrapperDiv = styled.div`
   text-align: center;
 `;
 
-function getOption(todos: any[]) {
+function getOption(todos: Todo[]) {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const series = buildSeries(days, todos);
 
@@ -49,11 +50,11 @@ function getOption(todos: any[]) {
     series,
   };
 
-  function buildSeries(days: string[], todos: any[]) {
+  function buildSeries(days: string[], todos: Todo[]) {
     const currentDay = new Date().getDay();
     return todos.map((t) => {
       return {
-        name: t.todo,
+        name: t.text,
         type: "bar",
         stack: "total",
         label: {
@@ -63,7 +64,7 @@ function getOption(todos: any[]) {
           focus: "series",
         },
         data: days.map((d, dayIndex) =>
-          dayIndex === currentDay - 1 ? t.completed : 0
+          dayIndex === currentDay - 1 ? t.count : 0
         ),
       };
     });

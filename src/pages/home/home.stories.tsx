@@ -1,56 +1,77 @@
-import { ActionType, TimerState } from "../../services/reducers/timer-reducer";
-import { TimerComponent, TodosComponent } from "./components";
-import { TimerProps } from "./components/timer-component";
-import { TodosProps } from "./components/todos-component";
+import { action } from "@storybook/addon-actions";
+import { v4 as uuidv4 } from "uuid";
+import { ActionType, TimerStateValue } from "../../services/reducers/timer-reducer";
+
+import { Timer, Todos } from "./components";
 
 export default function Index() {
   return <div></div>;
 }
 
-export const TimerComponentInstance = () => {
-  const props: TimerProps = {
-    currentTodo: "hello",
-    minutes: 10,
-    seconds: 10,
-    onClick: () => {},
-    onPause: () => {},
-    onResume: () => {},
-    newState: ActionType.Start,
-    timerState: TimerState.Stopped,
-  };
+export const TimerNotStartedComponentInstance = () => {
+  const props = getTimerProps();
 
-  return <TimerComponent {...props} />;
+  return <Timer.TimerComponent {...props} />;
+};
+
+export const TimerStartedComponentInstance = () => {
+  const props = getTimerProps();
+  props.timerState = TimerStateValue.Started;
+
+  return <Timer.TimerComponent {...props} />;
 };
 
 export const TodosComponentInstance = () => {
-  const props: TodosProps = {
-    todoText: "hello world",
+  const props = getTodosProps();
+  return <Todos.TodosComponent {...props} />;
+};
+
+export const TodosEmptyComponentInstance = () => {
+  const props = getTodosProps();
+  props.remainingTodos = [];
+  props.completedTodos = [];
+  return <Todos.TodosComponent {...props} />;
+};
+
+function getTimerProps(): Timer.TimerProps {
+  return {
+    currentTodo: "Read about XState",
+    minutes: 25,
+    seconds: 0,
+    onStartStop: action("onStartStop"),
+    onPause: action("onPause"),
+    onResume: action("onResume"),
+    newState: ActionType.Start,
+    timerState: TimerStateValue.Stopped,
+  };
+}
+
+function getTodosProps(): Todos.TodosProps {
+  const [xGuid, yGuid, zGuid] = [uuidv4(), uuidv4(), uuidv4()];
+
+  return {
+    text: "hello world",
     onChange: (s: string) => {},
     remainingTodos: [
-      { todoGuid: "x", todo: "x", count: 2 },
-      { todoGuid: "x", todo: "y", count: 3 },
-      { todoGuid: "x", todo: "z", count: 4 },
+      { guid: xGuid, text: "x", count: 2 },
+      { guid: yGuid, text: "y", count: 3 },
+      { guid: zGuid, text: "z", count: 4 },
     ],
-    remainingHours: 0,
-    remainingMinutes: 0,
 
     completedTodos: [
-      { todo: "x", completed: 2 },
-      { todo: "y", completed: 3 },
-      { todo: "z", completed: 4 },
+      { guid: xGuid, text: "x", count: 2 },
+      { guid: yGuid, text: "y", count: 3 },
+      { guid: zGuid, text: "z", count: 4 },
     ],
-    completedHours: 0,
-    completedMinutes: 0,
+    timerDuration: 30,
 
     selectedTodoGuid: undefined,
-    timerState: TimerState.Stopped,
+    timerState: TimerStateValue.Stopped,
 
-    onAdd: () => {},
-    onClick: (guid: string) => {},
-    onIncrease: (guid: string) => {},
-    onDecrease: (guid: string) => {},
-    onDelete: (guid: string) => {},
+    onAdd: action("onAdd"),
+    onSelected: action("onSelected"),
+    onIncrease: action("onIncrease"),
+    onDecrease: action("onDecrease"),
+    onDelete: action("onDelete"),
   };
-
-  return <TodosComponent {...props} />;
-};
+}

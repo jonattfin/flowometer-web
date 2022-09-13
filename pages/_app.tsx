@@ -4,8 +4,7 @@ import { Divider, Grid, Stack } from "@mui/material";
 import Link from "next/link";
 import styled from "@emotion/styled";
 import GitHubIcon from "@mui/icons-material/GitHub";
-
-import { AppProvider } from "../src/services/providers";
+import { AppProvider } from "../src/services/provider";
 
 const navItems = [
   { text: "Home", href: "/" },

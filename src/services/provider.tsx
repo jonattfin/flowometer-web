@@ -3,26 +3,41 @@ import React, { useState, useReducer, useContext } from "react";
 import {
   reducer as todosReducer,
   initialState as todosInitialState,
-} from "../reducers/todos-reducer";
+  TodoType,
+} from "./reducers/todos-reducer";
 
 import {
   reducer as timerReducer,
   initialState as timerInitialState,
-} from "../reducers/timer-reducer";
+  TimerState,
+  TimerStateValue,
+} from "./reducers/timer-reducer";
 
 const DefaultTimerDuration = 25;
 
 type AppContextType = {
   timerDuration: number;
-  setTimerDuration?: any;
-  todosState?: any;
-  todosDispatch?: any;
-  timerState?: any;
-  timerDispatch?: any;
+  setTimerDuration: any;
+  todosState: TodoType;
+  todosDispatch: any;
+  timerState: TimerState;
+  timerDispatch: any;
 };
 
 const initialContext: AppContextType = {
   timerDuration: DefaultTimerDuration,
+  setTimerDuration: () => {},
+  todosState: {
+    todos: [],
+    completedTodos: [],
+  },
+  todosDispatch: () => {},
+
+  timerState: {
+    seconds: 0,
+    currentState: TimerStateValue.Stopped,
+  },
+  timerDispatch: () => {},
 };
 
 const AppContext = React.createContext(initialContext);
@@ -57,22 +72,15 @@ export function AppProvider(props: any) {
 
 export function useTodos() {
   const { todosState, todosDispatch } = useContext(AppContext);
-  if (!todosState && !todosDispatch) {
-    throw new Error("useTodos must be used within an AppProvider");
-  }
   return { state: todosState, dispatch: todosDispatch };
 }
 
 export function useTimer() {
   const { timerState, timerDispatch } = useContext(AppContext);
-  if (!timerState && !timerDispatch) {
-    throw new Error("useTimer must be used within an AppProvider");
-  }
   return { state: timerState, dispatch: timerDispatch };
 }
 
 export function useTimerDuration() {
   const { timerDuration, setTimerDuration } = useContext(AppContext);
-
   return { state: timerDuration, setTimerDuration };
 }

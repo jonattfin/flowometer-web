@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { Stack } from "@mui/material";
 import Head from "next/head";
 
-import { TimerContainer, TodosContainer } from "./containers";
+import { Timer, Todos } from "./components";
 
 export default function Home() {
   return (
@@ -15,10 +15,10 @@ export default function Home() {
 
       <Stack spacing={2}>
         <TimerWrapper>
-          <TimerContainer />
+          <Timer.TimerContainer />
         </TimerWrapper>
         <TodosWrapper>
-          <TodosContainer />
+          <Todos.TodosContainer />
         </TodosWrapper>
       </Stack>
     </>

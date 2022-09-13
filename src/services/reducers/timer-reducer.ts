@@ -1,6 +1,6 @@
 import produce from "immer";
 
-export enum TimerState {
+export enum TimerStateValue {
   Stopped,
   Started,
   Paused,
@@ -15,15 +15,17 @@ export enum ActionType {
   CountSeconds = "CountSeconds",
 }
 
-export const initialState = {
-  seconds: 0,
-  currentState: TimerState.Stopped,
+export type TimerState = {
+  seconds: number;
+  currentState: TimerStateValue;
 };
 
-export const reducer = (
-  state: { seconds: number; currentState: TimerState },
-  action: { type: ActionType }
-) => {
+export const initialState: TimerState = {
+  seconds: 0,
+  currentState: TimerStateValue.Stopped,
+};
+
+export const reducer = (state: TimerState, action: { type: ActionType }) => {
   switch (action.type) {
     case ActionType.CountSeconds: {
       return produce(state, (draftState) => {
@@ -34,18 +36,18 @@ export const reducer = (
     case ActionType.Stop: {
       return produce(state, (draftState) => {
         draftState.seconds = 0;
-        draftState.currentState = TimerState.Stopped;
+        draftState.currentState = TimerStateValue.Stopped;
       });
     }
     case ActionType.Pause: {
       return produce(state, (draftState) => {
-        draftState.currentState = TimerState.Paused;
+        draftState.currentState = TimerStateValue.Paused;
       });
     }
     case ActionType.Start:
     case ActionType.Resume: {
       return produce(state, (draftState) => {
-        draftState.currentState = TimerState.Started;
+        draftState.currentState = TimerStateValue.Started;
       });
     }
     default:
