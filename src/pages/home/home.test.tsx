@@ -77,7 +77,7 @@ describe("Home tests", () => {
           { id: "increase", handler: props.onIncrease },
           { id: "decrease", handler: props.onDecrease },
           { id: "delete", handler: props.onDelete },
-        ].map((element) => {
+        ].forEach((element) => {
           it(`for button ${element.id}`, async () => {
             const button = await screen.findByTestId(`${element.id}-button`);
             fireEvent.change(button, {});

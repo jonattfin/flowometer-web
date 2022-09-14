@@ -11,7 +11,8 @@
     "build-storybook": "build-storybook",
     "test": "jest --watch",
     "test:cover": "jest --coverage",
-    "test:ci": "jest --ci"
+    "test:ci": "jest --ci",
+    "cypress:open": "cypress open"
   },
   "dependencies": {
     "@emotion/react": "^11.10.4",
@@ -19,6 +20,7 @@
     "@mui/icons-material": "^5.10.3",
     "@mui/material": "^5.10.3",
     "@types/lodash": "^4.14.184",
+    "cypress": "^10.8.0",
     "echarts": "^5.3.3",
     "echarts-for-react": "^3.0.2",
     "immer": "^9.0.15",

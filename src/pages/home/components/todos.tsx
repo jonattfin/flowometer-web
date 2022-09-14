@@ -132,6 +132,7 @@ export function TodosComponent(props: TodosProps) {
           label="Add new todo"
           variant="outlined"
           size="small"
+          data-testid="add-new-todo"
           fullWidth
           value={props.text}
           onChange={(ev) => props.onChange(ev.target.value)}
