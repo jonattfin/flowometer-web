@@ -52,7 +52,7 @@ export function TimerContainer() {
 
   useEffect(() => {
     if (minutes === 0 && seconds === 0) {
-      timerDispatch({ type: ActionType.Stop });
+      onStartStop();
     }
   }, [minutes, seconds]);
 

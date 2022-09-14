@@ -139,6 +139,7 @@ export function TodosComponent(props: TodosProps) {
         <Button
           variant="contained"
           onClick={() => props.onAdd()}
+          data-testid="add-button"
           disabled={props.text.length == 0}
         >
           Add
@@ -164,12 +165,14 @@ export function TodosComponent(props: TodosProps) {
                     [{count}]
                     <IconButton
                       edge="end"
+                      data-testid="increase-button"
                       onClick={() => props.onIncrease(guid)}
                     >
                       <AddCircleIcon color="success" />
                     </IconButton>
                     <IconButton
                       edge="end"
+                      data-testid="decrease-button"
                       disabled={count == 1}
                       onClick={() => props.onDecrease(guid)}
                     >
@@ -177,6 +180,7 @@ export function TodosComponent(props: TodosProps) {
                     </IconButton>
                     <IconButton
                       edge="end"
+                      data-testid="delete-button"
                       onClick={() => props.onDelete(guid)}
                       disabled={
                         props.timerState != TimerStateValue.Stopped &&
