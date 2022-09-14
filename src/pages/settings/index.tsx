@@ -1,4 +1,5 @@
-import { Stack, TextField, Button } from "@mui/material";
+import styled from "@emotion/styled";
+import { Stack, TextField, Button, Paper } from "@mui/material";
 import React, { useState } from "react";
 import { useTimerDuration } from "../../services/provider";
 
@@ -14,22 +15,37 @@ export default function Settings() {
   };
 
   return (
-    <Stack spacing={1} direction="row">
-      <TextField
-        label="Change timer duration"
-        variant="outlined"
-        size="small"
-        // fullWidth
-        value={currentValue}
-        onChange={onChange}
-      />
-      <Button
-        variant="contained"
-        onClick={onSave}
-        disabled={currentValue == timerDuration || currentValue < 5}
-      >
-        Save
-      </Button>
-    </Stack>
+    <>
+      <SeparatorDiv />
+      <Paper>
+        <InnerDiv>
+          <Stack spacing={1} direction="row">
+            <TextField
+              label="Change timer duration"
+              variant="outlined"
+              size="small"
+              // fullWidth
+              value={currentValue}
+              onChange={onChange}
+            />
+            <Button
+              variant="contained"
+              onClick={onSave}
+              disabled={currentValue == timerDuration || currentValue < 5}
+            >
+              Save
+            </Button>
+          </Stack>
+        </InnerDiv>
+      </Paper>
+    </>
   );
 }
+
+const SeparatorDiv = styled.div`
+  margin-top: 1vh;
+`;
+
+const InnerDiv = styled.div`
+  padding: 50px;
+`;

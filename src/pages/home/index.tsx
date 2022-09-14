@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Stack } from "@mui/material";
+import { Paper, Stack } from "@mui/material";
 import Head from "next/head";
 
 import { Timer, Todos } from "./components";
@@ -26,7 +26,7 @@ export default function Home() {
 }
 
 const TimerWrapper = styled.div`
-  background-color: orange;
+  background-color: #559e54;
   border-radius: 5px;
   padding: 3vh;
 `;
@@ -34,4 +34,6 @@ const TimerWrapper = styled.div`
 const TodosWrapper = styled.div`
   padding: 3vh;
   border-radius: 5px;
+  background-color: #175973;
+  margin: 3vh;
 `;

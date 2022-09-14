@@ -5,64 +5,71 @@ import Link from "next/link";
 import styled from "@emotion/styled";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import { AppProvider } from "../src/services/provider";
+import { ThemeProvider, createTheme, ThemeOptions } from "@mui/material/styles";
 
-const navItems = [
-  { text: "Home", href: "/" },
-  { text: "Stats", href: "/stats" },
-  { text: "Settings", href: "/settings" },
-];
+import { Header } from "../src/_shared_";
+import { useState } from "react";
+
+const blackColor = "#151B24";
+const whiteColor = "white";
+
+const getTheme = () => {
+  const themeObject: ThemeOptions = {
+    palette: {
+      mode: "dark",
+      background: {
+        default: blackColor,
+        paper: blackColor,
+      },
+      primary: {
+        main: "#1976d2",
+      },
+    },
+  };
+
+  return createTheme(themeObject);
+};
 
 export default function MyApp({ Component, pageProps }: AppProps) {
+  const [theme, setTheme] = useState("dark");
+
+  const MainContainer = getMainContainer(theme);
   return (
     <AppProvider>
-      <header></header>
-      <main>
-        <Grid container spacing={2}>
-          <Grid item xs lg={3}>
-            &nbsp;
-          </Grid>
-          <Grid item xs={10} md={8} lg={6}>
-            <MainContainer>
-              <Stack
-                direction="row"
-                spacing={2}
-                justifyContent="flex-end"
-                alignItems="center"
-              >
-                {navItems.map((item) => (
-                  <Link key={item.text} href={`${item.href}`}>
-                    {item.text}
-                  </Link>
-                ))}
-                <Divider />
-                <a
-                  href="https://github.com/jonattfin/flowometer-web"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <GitHubIcon fontSize="small"></GitHubIcon>
-                </a>
-                <a
-                  href="https://sonarcloud.io/summary/new_code?id=jonattfin_flowometer-web"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <img src="https://sonarcloud.io/api/project_badges/measure?project=jonattfin_flowometer-web&metric=alert_status" />
-                </a>
-              </Stack>
-            </MainContainer>
-            <Component {...pageProps} />
-          </Grid>
-          <Grid item xs lg={3}>
-            &nbsp;
-          </Grid>
-        </Grid>
-      </main>
-      <footer></footer>
+      <MainContainer>
+        <ThemeProvider theme={getTheme()}>
+          <main>
+            <Grid container spacing={2}>
+              <Grid item xs lg={3}>
+                &nbsp;
+              </Grid>
+              <Grid item xs={10} md={8} lg={6}>
+                <Header {...{ theme, setTheme }} />
+                <Component {...pageProps} />
+              </Grid>
+              <Grid item xs lg={3}>
+                &nbsp;
+              </Grid>
+            </Grid>
+          </main>
+          <footer></footer>
+        </ThemeProvider>
+      </MainContainer>
     </AppProvider>
   );
 }
 
-const MainContainer = styled.div`
-  padding: 10px;
-`;
+function getMainContainer(theme: string) {
+  let backgroundColor = whiteColor;
+  let color = blackColor;
+  if (theme == "dark") {
+    color = whiteColor;
+    backgroundColor = blackColor;
+  }
+
+  return styled.div`
+    background-color: ${backgroundColor};
+    color: ${color};
+    height: 100vh;
+  `;
+}
