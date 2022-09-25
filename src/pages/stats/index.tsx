@@ -22,7 +22,7 @@ const WrapperDiv = styled.div`
 `;
 
 function getOption(todos: Todo[]) {
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const series = buildSeries(days, todos);
 
   return {
@@ -63,8 +63,8 @@ function getOption(todos: Todo[]) {
         emphasis: {
           focus: "series",
         },
-        data: days.map((d, dayIndex) =>
-          dayIndex === currentDay - 1 ? t.count : 0
+        data: days.map((_d, dayIndex) =>
+          dayIndex === currentDay ? t.count : 0
         ),
       };
     });
